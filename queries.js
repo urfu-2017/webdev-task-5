@@ -25,7 +25,7 @@ module.exports = class Queries {
             rating: { type: Number, min: 1, max: 5 }
         });
 
-        const cartSchema = new mongoose.Schema({
+        const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема корзины тут
             login: { type: String, unique: true },
             items: {
