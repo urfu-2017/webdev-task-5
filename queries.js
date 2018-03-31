@@ -1,9 +1,18 @@
+/* eslint-disable */
 'use strict';
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({
-            // Ваша схема сувенира тут
+            tags: [String],
+            reviews: [],
+            name: String,
+            price: Number,
+            image: String,
+            rating: Number,
+            country: String,
+            amount: Number,
+            isRecent: Boolean
         });
 
         const cartSchema = mongoose.Schema({
@@ -19,6 +28,7 @@ module.exports = class Queries {
 
     getAllSouvenirs() {
         // Данный метод должен возвращать все сувениры
+        return this._Souvenir.find();
     }
 
     getCheapSouvenirs(price) {
