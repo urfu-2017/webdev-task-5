@@ -48,8 +48,8 @@ module.exports = class Queries {
     getAllSouvenirs() {
         // Данный метод должен возвращать все сувениры
 
-        // return this._Souvenir.find();
-        return this._Cart.find();
+        return this._Souvenir.find();
+        // return this._Cart.find();
         // return this._Souvenir.find({ _id: '5abe65524d0c9d02c12eafb8' });
     }
 
