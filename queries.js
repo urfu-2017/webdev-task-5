@@ -60,7 +60,7 @@ module.exports = class Queries {
     getSouvenirsByTag(tag) {
         return this._Souvenir
             .where('tags', tag)
-            .select('name image price')
+            .select({ name: 1, image: 1, price: 1, _id: 0 })
             .exec();
     }
 
