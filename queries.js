@@ -4,7 +4,6 @@
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewsSchema = mongoose.Schema({
-            id: mongoose.Types.ObjectId,
             login: String,
             // login: { type: String, required: true },
             date: Date,
@@ -13,7 +12,7 @@ module.exports = class Queries {
             // text: { type: String, required: true },
             // rating: { type: Number, required: true },
             isApproved: Boolean
-        });
+        }, { _id: false });
         const souvenirSchema = mongoose.Schema({
             tags: [String],
             reviews: [reviewsSchema],

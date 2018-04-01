@@ -15,7 +15,7 @@ const Queries = require('./queries');
 
     try {
         // Здесь можно делать запросы, чтобы проверять, что они правильно работают
-        // const result = await queries.getAllSouvenirs();
+        // let result = await queries.getAllSouvenirs();
         // result = await queries.getCheapSouvenirs(2900);
         // result = await queries.getTopRatingSouvenirs(10);
         // result = await queries.getSouvenirsByTag('техника');
