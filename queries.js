@@ -1,11 +1,11 @@
-/* eslint-disable */
 'use strict';
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
-        const souvenirSchema = mongoose.Schema({
+        const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             tags: [String],
-            reviews: [{ login: String, date: Date, text: String, rating: Number, isApproved: Boolean }],
+            reviews: [{ login: String, date: Date,
+                text: String, rating: Number, isApproved: Boolean }],
             name: String,
             image: String,
             price: { type: Number, index: true },
@@ -15,7 +15,7 @@ module.exports = class Queries {
             isRecent: Boolean
         });
 
-        const cartSchema = mongoose.Schema({
+        const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема корзины тут
             items: [{ souvenirId: String, amount: Number }],
             login: { type: String, unique: true }
@@ -58,7 +58,7 @@ module.exports = class Queries {
                 $and:
                     [{ country }, { rating: { $gte: rating } }, { price: { $lte: price } }]
             },
-                { _id: 0, amount: 1 })
+            { _id: 0, amount: 1 })
             .then(res => {
                 let sum = 0;
                 res.forEach(entry => {
@@ -88,7 +88,7 @@ module.exports = class Queries {
                     }
                 });
             })
-            .then(() => this._Souvenir.find({ _id: { $in: resArr } }))
+            .then(() => this._Souvenir.find({ _id: { $in: resArr } }));
     }
 
     deleteOutOfStockSouvenirs() {
@@ -121,7 +121,7 @@ module.exports = class Queries {
                 reviews.forEach(comment => {
                     oldRating += comment.rating;
                     rates++;
-                })
+                });
             })
             .then(() => {
                 const updatedRating = (oldRating + rating) / (rates + 1);
@@ -136,8 +136,8 @@ module.exports = class Queries {
                                 }
                             }
                         }
-                    ))
-            })
+                    ));
+            });
     }
 
     async getCartSum(login) {
@@ -151,13 +151,13 @@ module.exports = class Queries {
             res[0].items.forEach(souvenir => {
                 ids.push(souvenir.souvenirId);
                 amounts.push(souvenir.amount);
-            })
+            });
         });
         await this._Souvenir.find({ _id: { $in: ids } }).then(res => {
             res.forEach((souvenir, idx) => {
                 total += souvenir.price * amounts[idx];
-            })
-        })
+            });
+        });
 
         return total;
     }
