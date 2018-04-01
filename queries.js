@@ -6,6 +6,7 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const schema = mongoose.Schema;
         const { ObjectId } = schema;
+        const PositiveNumber = { type: Number, min: 0 };
 
         const souvenirSchema = schema({
             name: String,
@@ -16,14 +17,14 @@ module.exports = class Queries {
                 login: String,
                 date: Date,
                 text: String,
-                rating: Number,
+                rating: PositiveNumber,
                 isApproved: Boolean
             }],
             image: String,
-            price: Number,
-            amount: Number,
+            price: PositiveNumber,
+            amount: PositiveNumber,
             country: String,
-            rating: Number,
+            rating: PositiveNumber,
             isRecent: Boolean
 
         });
@@ -33,7 +34,7 @@ module.exports = class Queries {
             login: { type: String, index: { unique: true } },
             items: [{
                 souvenirId: ObjectId,
-                amount: Number
+                amount: PositiveNumber
             }]
         });
 
