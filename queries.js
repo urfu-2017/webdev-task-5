@@ -53,7 +53,7 @@ module.exports = class Queries {
         return this._Souvenir
             .find()
             .where('price')
-            .lt(price);
+            .lte(price);
     }
 
     getTopRatingSouvenirs(n) {
@@ -80,7 +80,8 @@ module.exports = class Queries {
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
         return this._Souvenir
-            .find({ country, rating: { $gte: rating }, price: { $lte: price } });
+            .find({ country, rating: { $gte: rating }, price: { $lte: price } })
+            .count();
     }
 
     searchSouvenirs(substring) {
