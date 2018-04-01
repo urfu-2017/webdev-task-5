@@ -5,28 +5,31 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewsSchema = mongoose.Schema({
             // id: ObjectId,
-            login: { type: String, required: true },
-            date: { type: Date, default: new Date() },
-            rating: { type: Number, min: 1, max: 5, required: true },
-            text: { type: String, required: true },
-            isApproved: { type: Boolean, default: false }
+            login: String,
+            // login: { type: String, required: true },
+            date: Date,
+            text: String,
+            rating: Number,
+            // text: { type: String, required: true },
+            // rating: { type: Number, required: true },
+            isApproved: Boolean
         });
         const souvenirSchema = mongoose.Schema({
             tags: [String],
             reviews: [reviewsSchema],
             name: String,
             image: String,
-            price: { type: Number, min: 0, index: true, required: true },
-            amount: { type: Number, min: 0, required: true },
-            country: { type: String, index: true, required: true },
-            rating: { type: Number, min: 1, max: 5, required: true, index: true },
+            price: { type: Number, index: true },
+            amount: Number,
+            country: { type: String, index: true },
+            rating: { type: Number, index: true },
             isRecent: Boolean,
             __v: Number
         });
 
         const itemInCartSchema = mongoose.Schema({
             // souvenirId: ObjectId,
-            amount: { type: Number, min: 0, required: true }
+            amount: Number
         });
 
         const cartSchema = mongoose.Schema({
@@ -45,7 +48,8 @@ module.exports = class Queries {
     getAllSouvenirs() {
         // Данный метод должен возвращать все сувениры
 
-        return this._Souvenir.find();
+        // return this._Souvenir.find();
+        return this._Cart.find();
         // return this._Souvenir.find({ _id: '5abe65524d0c9d02c12eafb8' });
     }
 
@@ -110,13 +114,28 @@ module.exports = class Queries {
         });
     }
 
-    deleteOutOfStockSouvenirs() {
+    async deleteOutOfStockSouvenirs() {
         // Данный метод должен удалять все сувениры, которых нет в наличии
         // (то есть amount = 0)
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
+        const souvenirsForDelete = await this._Souvenir.find({ amount: 0 }, { _id: 1 });
+        if (souvenirsForDelete.length !== 0) {
+            const idInCart = souvenirsForDelete.map(item => {
+                return {
+                    'items.souvenirId': item._id
+                };
+            });
+            const deleteFromCart = await this._Cart.deleteMany({ $or: idInCart });
+            const deleteFromStorage = await this._Souvenir.deleteMany({ amount: 0 });
 
-        return this._Souvenir.deleteMany({ amount: 0 });
+            return {
+                ok: 1,
+                n: deleteFromCart.n + deleteFromStorage.n
+            };
+        }
+
+        return await this._Souvenir.deleteMany({ amount: 0 });
     }
 
     async addReview(souvenirId, { login, rating, text }) {
@@ -135,8 +154,10 @@ module.exports = class Queries {
 
         reviews.push({
             login: String(login),
+            date: new Date(),
             text: String(text),
-            rating: parseFloat(rating)
+            rating: parseFloat(rating),
+            isApproved: false
         });
 
         const newRating = reviews.reduce((currentRating, review, index) => {

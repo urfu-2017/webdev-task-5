@@ -31,7 +31,7 @@ const Queries = require('./queries');
         // { login: 'spt30', rating: '4.2q', text: 'Спасибо, все отлично (нет4)' });
         // const result = await queries.getCartSum('punisher');
 
-        // console.log(result[0]);
+        // console.log(result);
 
     } catch (error) {
         console.error(error);
