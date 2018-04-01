@@ -169,18 +169,27 @@ module.exports = class Queries {
 
         const prices = await this._Souvenir.find({ $or: ids });
 
+        let sum = 0;
         prices.forEach(priceObj => {
             const price = priceObj.price;
             const currentId = priceObj._id;
             items.forEach(item => {
+                const amount = item.amount;
                 if (String(item._doc.souvenirId) === String(currentId)) {
-                    item.price = price;
+                    sum += price * amount;
                 }
             });
         });
 
-        const filterItems = items.filter(item => item.hasOwnProperty('price'));
+        // await items.forEach(async item => {
+        //     const itemInfo = await this._Souvenir.find({ _id: item._doc.souvenirId });
+        //     console.log(itemInfo)
+        //     sum += item.amount * itemInfo.price;
+        // });
 
-        return filterItems.reduce((sum, item) => sum + item.price * item.amount, 0);
+        return sum;
+        // const filterItems = items.filter(item => item.hasOwnProperty('price'));
+
+        // return filterItems.reduce((sum, item) => sum + item.price * item.amount, 0);
     }
 };
