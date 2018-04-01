@@ -120,14 +120,15 @@ module.exports = class Queries {
     async addReview(souvenirId, { login, rating, text }) {
         const id = uuidv4();
         const date = new Date();
-        await this._Souvenir.findOneAndUpdate({ _id: souvenirId },
+        // note: explicit cast is required due to https://github.com/Automattic/mongoose/issues/1399
+        // eslint-disable-next-line new-cap
+        const souvenir = { _id: Types.ObjectId(souvenirId) };
+        await this._Souvenir.findOneAndUpdate(souvenir,
             { $push: { reviews: { login, id, text, rating, date } } }
         );
         const aggregateResult = await this._Souvenir.aggregate([
-            // note: explicit cast is required due to
-            // https://github.com/Automattic/mongoose/issues/1399
             // eslint-disable-next-line new-cap
-            { $match: { _id: Types.ObjectId(souvenirId) } },
+            { $match: souvenir },
             { $unwind: '$reviews' },
             { $replaceRoot: { newRoot: '$reviews' } },
             {
@@ -139,7 +140,7 @@ module.exports = class Queries {
             }
         ]);
 
-        return this._Souvenir.findOneAndUpdate({ _id: souvenirId },
+        return this._Souvenir.findOneAndUpdate(souvenir,
             { $set: { rating: aggregateResult[0].rating } }
         );
     }
