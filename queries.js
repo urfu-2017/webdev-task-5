@@ -5,13 +5,13 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({
             tags: [String],
-            reviews: [],
+            reviews: [{ login: String, date: Date, text: String, rating: Number, isApproved: Boolean }],
             name: String,
-            price: Number,
             image: String,
-            rating: Number,
-            country: String,
+            price: Number,
             amount: Number,
+            country: String,
+            rating: Number,
             isRecent: Boolean
         });
 
@@ -24,24 +24,24 @@ module.exports = class Queries {
         this._Cart = mongoose.model('Cart', cartSchema, cartsCollection);
     }
 
-    // Далее идут методы, которые вам необходимо реализовать:
-
     getAllSouvenirs() {
-        // Данный метод должен возвращать все сувениры
         return this._Souvenir.find();
     }
 
     getCheapSouvenirs(price) {
-        // Данный метод должен возвращать все сувениры, цена которых меньше или равна price
+        return this._Souvenir.find({ price: { $lte: price } });
     }
 
     getTopRatingSouvenirs(n) {
         // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
+        return this._Souvenir.find().sort({ rating: -1 })
+            .limit(n);
     }
 
     getSouvenirsByTag(tag) {
         // Данный метод должен возвращать все сувениры, в тегах которых есть tag
         // Кроме того, в ответе должны быть только поля name, image и price
+        return this._Souvenir.find({ tags: tag }, { name: 1, image: 1, price: 1, _id: 0 });
     }
 
     getSouvenrisCount({ country, rating, price }) {
@@ -51,24 +51,58 @@ module.exports = class Queries {
 
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
+        return this._Souvenir
+            .find({
+                $and:
+                    [{ country }, { rating: { $gte: rating } }, { price: { $lte: price } }]
+            },
+                { _id: 0, amount: 1 })
+            .then(res => {
+                let sum = 0;
+                res.forEach(entry => {
+                    sum += entry.amount;
+                });
+
+                return sum;
+            });
     }
 
     searchSouvenirs(substring) {
         // Данный метод должен возвращать все сувениры, в название которых входит
         // подстрока substring. Поиск должен быть регистронезависимым
+        return this._Souvenir.find({ name: new RegExp(substring, 'i') });
     }
 
     getDisscusedSouvenirs(date) {
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
+        const resArr = [];
+
+        return this._Souvenir.find({}, { _id: 1, reviews: 1 })
+            .then(res => {
+                res.forEach(entry => {
+                    if (entry.reviews[0] && entry.reviews[0].date >= date) {
+                        resArr.push(entry._id.toString());
+                    }
+                });
+            })
+            .then(() => this._Souvenir.find({ _id: { $in: resArr } }))
     }
 
     deleteOutOfStockSouvenirs() {
         // Данный метод должен удалять все сувениры, которых нет в наличии
         // (то есть amount = 0)
-
+        let deletedSouvenirs = 0;
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
+
+        return this._Souvenir.find({ amount: 0 }).then(res => {
+            deletedSouvenirs = res.length;
+        })
+            .then(() => this._Souvenir.remove({ amount: 0 }))
+            .then(() => {
+                return { ok: 1, n: deletedSouvenirs };
+            });
     }
 
     async addReview(souvenirId, { login, rating, text }) {
@@ -77,6 +111,31 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
+        let oldRating = 0;
+        let rates = 0;
+        await this._Souvenir.find({ _id: souvenirId })
+            .then(entryArr => {
+                const reviews = entryArr[0].reviews;
+                reviews.forEach(comment => {
+                    oldRating += comment.rating;
+                    rates++;
+                })
+            })
+            .then(() => {
+                const updatedRating = (oldRating + rating) / (rates + 1);
+                this._Souvenir.update({ _id: souvenirId },
+                    { $set: { rating: updatedRating } })
+                    .then(() => this._Souvenir.update(
+                        { _id: souvenirId },
+                        {
+                            $push: {
+                                reviews: {
+                                    login, date: new Date(), text, rating, isApproved: false
+                                }
+                            }
+                        }
+                    ))
+            })
     }
 
     async getCartSum(login) {
