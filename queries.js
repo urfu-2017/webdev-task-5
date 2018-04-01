@@ -70,7 +70,7 @@ module.exports = class Queries {
 
         return this._Souvenir
             .find(
-                { tags: tag },
+                { tags: { $regex: `.*${tag}.*`, $options: 'i' } },
                 { _id: 0, name: 1, image: 1, price: 1 }
             );
     }
