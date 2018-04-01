@@ -13,6 +13,8 @@ module.exports = class Queries {
             country: String,
             rating: { type: Number, index: true },
             isRecent: Boolean
+            // Ваша схема сувенира тут
+
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
