@@ -110,7 +110,7 @@ module.exports = class Queries {
         // первый отзыв на которые был оставлен не раньше даты date
 
         return this._Souvenir.find({
-            'reviews.0.date': { $gte: date }
+            'reviews.0.date': { $lte: date }
         });
     }
 
