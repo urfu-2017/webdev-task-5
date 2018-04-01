@@ -8,15 +8,17 @@ module.exports = class Queries {
             reviews: [{ login: String, date: Date, text: String, rating: Number, isApproved: Boolean }],
             name: String,
             image: String,
-            price: Number,
+            price: { type: Number, index: true },
             amount: Number,
             country: String,
-            rating: Number,
+            rating: { type: Number, index: true },
             isRecent: Boolean
         });
 
         const cartSchema = mongoose.Schema({
             // Ваша схема корзины тут
+            items: [{ souvenirId: String, amount: Number }],
+            login: { type: String, unique: true }
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
@@ -142,5 +144,21 @@ module.exports = class Queries {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
+        let total = 0;
+        const ids = [];
+        const amounts = [];
+        await this._Cart.find({ login }).then(res => {
+            res[0].items.forEach(souvenir => {
+                ids.push(souvenir.souvenirId);
+                amounts.push(souvenir.amount);
+            })
+        });
+        await this._Souvenir.find({ _id: { $in: ids } }).then(res => {
+            res.forEach((souvenir, idx) => {
+                total += souvenir.price * amounts[idx];
+            })
+        })
+
+        return total;
     }
 };
