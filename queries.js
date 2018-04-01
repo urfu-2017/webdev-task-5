@@ -40,14 +40,30 @@ module.exports = class Queries {
     }
 
 
+    /**
+     * Возвращает все сувениры
+     * @returns {Query}
+     */
     getAllSouvenirs() {
         return this._Souvenir.find();
     }
 
+
+    /**
+     * Возвращает все сувениры, цена которых меньше или равна price
+     * @param {Number} price
+     * @returns {Query}
+     */
     getCheapSouvenirs(price) {
         return this._Souvenir.find({ price: { $lte: price } });
     }
 
+
+    /**
+     * Возвращает топ n сувениров с самым большим рейтингом
+     * @param {Number} n
+     * @returns {Query}
+     */
     getTopRatingSouvenirs(n) {
         return this._Souvenir
             .find()
@@ -55,11 +71,27 @@ module.exports = class Queries {
             .limit(n);
     }
 
+
+    /**
+     * Возвращает все сувениры, в тегах которых есть tag
+     * В ответе только поля name, image и price
+     * @param {String} tag
+     * @returns {Query}
+     */
     getSouvenirsByTag(tag) {
         return this._Souvenir.find({ tags: { $elemMatch: { $eq: tag } } },
             { name: 1, image: 1, price: 1, _id: 0 });
     }
 
+
+    /**
+     * Возвращает количество сувениров, из страны country, с рейтингом больше или равной rating,
+     * и ценой меньше или равной price
+     * @param {String} country
+     * @param {String} rating
+     * @param {String} price
+     * @returns {Query}
+     */
     getSouvenrisCount({ country, rating, price }) {
         return this._Souvenir.count(
             {
@@ -70,18 +102,49 @@ module.exports = class Queries {
         );
     }
 
+
+    /**
+     * Возвращает все сувениры, в название которых входит подстрока substring.
+     * Поиск регистронезависимый
+     * @param {String} substring
+     * @returns {Query}
+     */
     searchSouvenirs(substring) {
         return this._Souvenir.find({ name: { $regex: `.*${substring}.*`, $options: 'i' } });
     }
 
+
+    /**
+     * Возвращает все сувениры, первый отзыв на которые был оставлен не раньше даты date
+     * @param {Date} date
+     * @returns {Query}
+     */
     getDisscusedSouvenirs(date) {
         return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
     }
 
+
+    /**
+     * Удаляет все сувениры, которых нет в наличии
+     * @returns {Query}
+     */
     deleteOutOfStockSouvenirs() {
         return this._Souvenir.remove({ amount: 0 });
     }
 
+
+    /**
+     * Добавляет отзыв к сувениру souvenirId, отзыв добавляется в конец массива
+     * (чтобы сохранить упорядоченность по дате),
+     * содержит login, rating, text - из аргументов,
+     * date - текущая дата и isApproved - false
+     * При добавлении отзыва рейтинг сувенира пересчитывается
+     * @param {ObjectId} souvenirId
+     * @param {String} login
+     * @param {Number} rating
+     * @param {String} text
+     * @returns {Query}
+     */
     async addReview(souvenirId, { login, rating, text }) {
         return this._Souvenir
             .findById(souvenirId)
@@ -93,6 +156,7 @@ module.exports = class Queries {
                         text,
                         date: new Date(),
                         isApproved: false
+                        // id: 'some random id'
                     }
                 );
                 let overallRating = 0;
@@ -104,13 +168,18 @@ module.exports = class Queries {
             });
     }
 
+    /**
+     * Считает общую стоимость корзины пользователя login
+     * @param {String} login
+     * @returns {Query}
+     */
     async getCartSum(login) {
         return this._Cart
             .findOne({ login })
             .then(cart => {
                 const promises = cart.items.reduce((accumulator, cartItem) => {
                     const promise = this._Souvenir.findById(cartItem.souvenirId)
-                        .then(souvenir => souvenir.price * cartItem.amount);
+                        .then(souvenir => (souvenir) ? souvenir.price * cartItem.amount: 0);
                     accumulator.push(promise);
 
                     return accumulator;

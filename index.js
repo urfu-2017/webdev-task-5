@@ -12,7 +12,12 @@ const Queries = require('./queries');
     });
 
     try {
-        const result = await queries.getCartSum('steve');
+        const result = await queries.addReview('5abe65514d0c9d02c12eaf55',
+            {
+                login: 'check',
+                rating: 4,
+                text: 'gooo'
+            });
 
         console.info(result);
     } catch (error) {
