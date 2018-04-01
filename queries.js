@@ -8,7 +8,7 @@ module.exports = class Queries {
             text: { type: String, required: true },
             date: { type: Date, default: () => new Date() },
             isApproved: { type: Boolean, default: false }
-        });
+        }, { _id: null });
 
         const souvenirSchema = new mongoose.Schema({
             // Ваша схема сувенира тут
@@ -103,18 +103,17 @@ module.exports = class Queries {
 
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
-        // const souvenirs = await this._Souvenir.find({ amount: 0 }, { _id: 1 });
-        // const ids = souvenirs.map(s => s.id);
+        const souvenirs = await this._Souvenir.find({ amount: 0 }, { _id: 1 });
+        const ids = souvenirs.map(s => s.id);
 
-        // await Promise.all([
-        //     this._Souvenir.remove({ _id: { $in: ids } }),
-        //     this._Cart.update(
-        //         { items: { $elemMatch: { souvenirId: { $in: ids } } } },
-        //         { $pull: { items: { souvenirId: { $in: ids } } } }, { multi: true })
-        // ]);
+        await Promise.all([
+            this._Souvenir.remove({ _id: { $in: ids } }),
+            this._Cart.update(
+                { 'items.souvenirId': { $in: ids } },
+                { $pull: { items: { souvenirId: { $in: ids } } } }, { multi: true })
+        ]);
 
-        // return { ok: 1, n: ids.length };
-        return this._Souvenir.remove({ amount: 0 });
+        return { ok: 1, n: ids.length };
     }
 
     async addReview(souvenirId, { login, rating, text }) {
@@ -139,14 +138,28 @@ module.exports = class Queries {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        const { items } = await this._Cart.findOne({ login }, { items: 1, _id: 0 });
+        const result = await this._Cart.aggregate([
+            { $match: { login } },
+            { $unwind: '$items' },
+            {
+                $lookup: {
+                    from: 'souvenirs',
+                    localField: 'items.souvenirId',
+                    foreignField: '_id',
+                    as: 'souvenirs'
+                }
+            },
+            { $unwind: '$souvenirs' },
+            {
+                $group: {
+                    _id: null,
+                    totalPrice: {
+                        $sum: { $multiply: ['$items.amount', '$souvenirs.price'] }
+                    }
+                }
+            }
+        ]);
 
-        const prices = await Promise.all(
-            items.map(item => this._Souvenir
-                .findOne({ _id: item.souvenirId }, { price: 1, _id: 0 })
-                .then(souvenir => souvenir.price * item.amount))
-        );
-
-        return prices.reduce((sum, price)=> sum + price);
+        return result[0].totalPrice;
     }
 };
