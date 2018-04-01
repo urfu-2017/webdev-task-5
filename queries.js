@@ -142,7 +142,7 @@ module.exports = class Queries {
 
         const prices = await Promise.all(
             items.map(item => this._Souvenir
-                .find({ _id: item.souvenirId }, { price: 1, _id: 0 })
+                .findOne({ _id: item.souvenirId }, { price: 1, _id: 0 })
                 .then(souvenir => souvenir.price * item.amount))
         );
 
