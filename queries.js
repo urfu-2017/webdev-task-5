@@ -6,6 +6,7 @@ module.exports = class Queries {
             tags: [String],
             reviews: [
                 {
+                    id: mongoose.Schema.Types.ObjectId,
                     login: String,
                     date: Date,
                     text: String,
@@ -15,10 +16,10 @@ module.exports = class Queries {
             ],
             name: String,
             image: String,
-            price: { type: Number, index: true },
+            price: Number,
             amount: Number,
-            country: { type: String, index: true },
-            rating: { type: Number, index: true },
+            country: String,
+            rating: Number,
             isRecent: Boolean
         });
 
