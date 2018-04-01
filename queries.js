@@ -90,7 +90,7 @@ module.exports = class Queries {
                     }
                 });
             })
-            .then(() => this._Souvenir.findOne({ _id: { $in: resArr } }));
+            .then(() => this._Souvenir.find({ _id: { $in: resArr } }));
     }
 
     deleteOutOfStockSouvenirs() {
@@ -117,7 +117,7 @@ module.exports = class Queries {
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
         let oldRating = 0;
         let rates = 0;
-        await this._Souvenir.findOne({ _id: souvenirId })
+        await this._Souvenir.find({ _id: souvenirId })
             .then(entryArr => {
                 const reviews = entryArr[0].reviews;
                 reviews.forEach(comment => {
@@ -155,7 +155,7 @@ module.exports = class Queries {
                 amounts.push(souvenir.amount);
             });
         });
-        await this._Souvenir.findOne({ _id: { $in: ids } }).then(res => {
+        await this._Souvenir.find({ _id: { $in: ids } }).then(res => {
             res.forEach((souvenir, idx) => {
                 total += souvenir.price * amounts[idx];
             });
