@@ -127,20 +127,17 @@ module.exports = class Queries {
         await this._Souvenir.findOneAndUpdate(souvenir,
             { $push: { reviews: { login, id, text, rating, date, isApproved } } }
         );
-        const aggregateResult = await this._Souvenir.aggregate([
-            { $match: souvenir },
-            { $unwind: '$reviews' },
-            { $replaceRoot: { newRoot: '$reviews' } },
-            {
-                $group:
-                    {
-                        _id: null,
-                        rating: { $avg: '$rating' }
-                    }
-            }
-        ]);
+        const aggregateResult = await this._Souvenir
+            .aggregate()
+            .match(souvenir)
+            .unwind('reviews')
+            .replaceRoot('reviews')
+            .group({
+                _id: null,
+                rating: { $avg: '$rating' }
+            });
 
-        return this._Souvenir.findOneAndUpdate(souvenir,
+        await this._Souvenir.findOneAndUpdate(souvenir,
             { $set: { rating: aggregateResult[0].rating } }
         );
     }
@@ -150,29 +147,22 @@ module.exports = class Queries {
     // в схеме
     async getCartSum(login) {
         const result = await this._Cart
-            .aggregate([
-                { $match: { login } },
-                { $unwind: '$items' },
-                { $replaceRoot: { newRoot: '$items' } },
-                {
-                    $lookup: {
-                        from: 'souvenirs',
-                        localField: 'souvenirId',
-                        foreignField: '_id',
-                        as: 'souvenirs'
-                    }
-                },
-                { $unwind: '$souvenirs' },
-                {
-                    $group:
-                        {
-                            _id: null,
-                            cost: {
-                                $sum: { $multiply: ['$souvenirs.price', '$amount'] }
-                            }
-                        }
-                }
-            ]);
+            .aggregate()
+            .match({ login })
+            .unwind('items')
+            .replaceRoot('items')
+            .lookup({
+                from: 'souvenirs',
+                localField: 'souvenirId',
+                foreignField: '_id',
+                as: 'souvenirs'
+            })
+            .unwind('souvenirs')
+            .group({
+                _id: null,
+                cost: { $sum: { $multiply: ['$souvenirs.price', '$amount'] } }
+            });
+
 
         return result[0].cost;
     }
