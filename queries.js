@@ -114,17 +114,17 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-        const souvenir = await this._Souvenir.findByIdAndUpdate(souvenirId);
-        souvenir.reviews.push({
-            login,
-            rating,
-            text,
-            date: Date.now(),
-            isApproved: false
-        });
-        const ratings = souvenir.reviews.map(review => review.rating);
-        souvenir.rating = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-        await souvenir.save();
+        // const souvenir = await this._Souvenir.findByIdAndUpdate(souvenirId);
+        // souvenir.reviews.push({
+        //     login,
+        //     rating,
+        //     text,
+        //     date: Date.now(),
+        //     isApproved: false
+        // });
+        // const ratings = souvenir.reviews.map(review => review.rating);
+        // souvenir.rating = ratings.reduce((a, b) => a + b, 0) / ratings.length;
+        // await souvenir.save();
     }
 
     async getCartSum(login) {
