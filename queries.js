@@ -8,7 +8,7 @@ module.exports = class Queries {
             text: { type: String, required: true },
             date: { type: Date, default: () => new Date() },
             isApproved: { type: Boolean, default: false }
-        }, { _id: null });
+        }, { _id: false });
 
         const souvenirSchema = new mongoose.Schema({
             // Ваша схема сувенира тут
