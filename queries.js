@@ -8,18 +8,18 @@ module.exports = class Queries {
         const { ObjectId } = schema;
         const PositiveNumber = { type: Number, min: 0 };
 
+        const reviewSchema = schema({
+            id: String,
+            login: String,
+            date: Date,
+            text: String,
+            rating: PositiveNumber,
+            isApproved: Boolean
+        }, { _id: false });
         const souvenirSchema = schema({
             name: String,
             tags: [String],
-            reviews: [{
-                _id: false,
-                id: String,
-                login: String,
-                date: Date,
-                text: String,
-                rating: PositiveNumber,
-                isApproved: Boolean
-            }],
+            reviews: [reviewSchema],
             image: String,
             price: PositiveNumber,
             amount: PositiveNumber,
