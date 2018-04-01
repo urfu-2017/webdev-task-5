@@ -4,8 +4,10 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             tags: [String],
-            reviews: [{ login: String, date: Date,
-                text: String, rating: Number, isApproved: Boolean }],
+            reviews: [{
+                login: String, date: Date,
+                text: String, rating: Number, isApproved: Boolean
+            }],
             name: String,
             image: String,
             price: { type: Number, index: true },
@@ -14,7 +16,6 @@ module.exports = class Queries {
             rating: { type: Number, index: true },
             isRecent: Boolean
             // Ваша схема сувенира тут
-
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
@@ -29,7 +30,7 @@ module.exports = class Queries {
     }
 
     getAllSouvenirs() {
-        return this._Souvenir.find();
+        return this._Souvenir.find({ _id: '5abe65514d0c9d02c12eafb1' }).then(res => res[0].reviews);
     }
 
     getCheapSouvenirs(price) {
@@ -56,19 +57,7 @@ module.exports = class Queries {
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
         return this._Souvenir
-            .find({
-                $and:
-                    [{ country }, { rating: { $gte: rating } }, { price: { $lte: price } }]
-            },
-            { _id: 0, amount: 1 })
-            .then(res => {
-                let sum = 0;
-                res.forEach(entry => {
-                    sum += entry.amount;
-                });
-
-                return sum;
-            });
+            .count({ country, rating: { $gte: rating }, price: { $lte: price } });
     }
 
     searchSouvenirs(substring) {
@@ -85,7 +74,8 @@ module.exports = class Queries {
         return this._Souvenir.find({}, { _id: 1, reviews: 1 })
             .then(res => {
                 res.forEach(entry => {
-                    if (entry.reviews[0] && entry.reviews[0].date >= date) {
+                    if (entry.reviews[entry.reviews.length - 1] &&
+                        new Date(entry.reviews[entry.reviews.length - 1].date) >= new Date(date)) {
                         resArr.push(entry._id.toString());
                     }
                 });
@@ -100,9 +90,10 @@ module.exports = class Queries {
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
 
-        return this._Souvenir.find({ amount: 0 }).then(res => {
-            deletedSouvenirs = res.length;
-        })
+        return this._Souvenir.find({ amount: 0 })
+            .then(res => {
+                deletedSouvenirs = res.length;
+            })
             .then(() => this._Souvenir.remove({ amount: 0 }))
             .then(() => {
                 return { ok: 1, n: deletedSouvenirs };
@@ -156,9 +147,7 @@ module.exports = class Queries {
             });
         });
         await this._Souvenir.find({ _id: { $in: ids } }).then(res => {
-            res.forEach((souvenir, idx) => {
-                total += souvenir.price * amounts[idx];
-            });
+            total = res.reduce((acc, souvenir, idx) => acc + souvenir.price * amounts[idx]);
         });
 
         return total;
