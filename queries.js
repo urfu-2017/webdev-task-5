@@ -4,7 +4,7 @@
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewsSchema = mongoose.Schema({
-            // id: ObjectId,
+            id: mongoose.Types.ObjectId,
             login: String,
             // login: { type: String, required: true },
             date: Date,
