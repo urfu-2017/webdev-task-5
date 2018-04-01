@@ -36,4 +36,4 @@ const Queries = require('./queries');
     }
 
     await mongoose.disconnect();
-}());
+})();
