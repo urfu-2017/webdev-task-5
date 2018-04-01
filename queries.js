@@ -5,12 +5,9 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewsSchema = mongoose.Schema({
             login: String,
-            // login: { type: String, required: true },
             date: Date,
             text: String,
             rating: Number,
-            // text: { type: String, required: true },
-            // rating: { type: Number, required: true },
             isApproved: Boolean
         }, { _id: false });
         const souvenirSchema = mongoose.Schema({
@@ -27,7 +24,6 @@ module.exports = class Queries {
         });
 
         const itemInCartSchema = mongoose.Schema({
-            // souvenirId: ObjectId,
             amount: Number
         });
 
@@ -37,19 +33,14 @@ module.exports = class Queries {
             __v: Number
         });
 
-        // Модели в таком формате нужны для корректного запуска тестов
         this._Souvenir = mongoose.model('Souvenir', souvenirSchema, souvenirsCollection);
         this._Cart = mongoose.model('Cart', cartSchema, cartsCollection);
     }
-
-    // Далее идут методы, которые вам необходимо реализовать:
 
     getAllSouvenirs() {
         // Данный метод должен возвращать все сувениры
 
         return this._Souvenir.find();
-        // return this._Cart.find();
-        // return this._Souvenir.find({ _id: '5abe65524d0c9d02c12eafb8' });
     }
 
     getCheapSouvenirs(price) {
@@ -100,7 +91,10 @@ module.exports = class Queries {
 
         return this._Souvenir
             .find({
-                name: { $regex: `.*${substring}.*`, $options: 'i' }
+                name: {
+                    $regex: `.*${substring}.*`,
+                    $options: 'i'
+                }
             });
     }
 
@@ -173,20 +167,18 @@ module.exports = class Queries {
 
         const prices = await this._Souvenir.find({ $or: ids });
 
-        let sum = 0;
-
-        items.forEach(item => {
-            const cartId = item._doc.souvenirId;
-            prices.forEach(priceObj => {
-                const storageId = priceObj._id;
+        prices.forEach(priceObj => {
+            const storageId = priceObj._id;
+            items.forEach(item => {
+                const cartId = item._doc.souvenirId;
                 if (String(cartId) === String(storageId)) {
-                    const amount = Math.min(item.amount, priceObj.amount);
-                    const price = priceObj.price;
-                    sum += price * amount;
+                    item.price = priceObj.price;
                 }
             });
         });
 
-        return sum;
+        const filterItems = items.filter(item => item.hasOwnProperty('price'));
+
+        return filterItems.reduce((sum, item) => sum + item.price * item.amount, 0);
     }
 };
