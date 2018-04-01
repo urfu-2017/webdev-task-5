@@ -179,7 +179,7 @@ module.exports = class Queries {
             .then(cart => {
                 const promises = cart.items.reduce((accumulator, cartItem) => {
                     const promise = this._Souvenir.findById(cartItem.souvenirId)
-                        .then(souvenir => (souvenir) ? souvenir.price * cartItem.amount: 0);
+                        .then(souvenir => (souvenir) ? souvenir.price * cartItem.amount : 0);
                     accumulator.push(promise);
 
                     return accumulator;
