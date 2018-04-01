@@ -6,9 +6,12 @@ module.exports = class Queries {
         const reviewsSchema = mongoose.Schema({
             // id: ObjectId,
             login: String,
+            // login: { type: String, required: true },
             date: Date,
             text: String,
             rating: Number,
+            // text: { type: String, required: true },
+            // rating: { type: Number, required: true },
             isApproved: Boolean
         });
         const souvenirSchema = mongoose.Schema({
@@ -133,10 +136,10 @@ module.exports = class Queries {
         const reviews = souvenir.reviews;
 
         reviews.push({
-            login,
+            login: String(login),
             date: new Date(),
-            text,
-            rating,
+            text: String(text),
+            rating: parseFloat(rating),
             isApproved: false
         });
 

@@ -3,6 +3,8 @@
 const mongoose = require('mongoose');
 const Queries = require('./queries');
 
+/* eslint-disable no-unused-vars */
+
 (async () => {
     await mongoose.connect('mongodb://localhost/webdev-task-5');
 
@@ -13,7 +15,7 @@ const Queries = require('./queries');
 
     try {
         // Здесь можно делать запросы, чтобы проверять, что они правильно работают
-        await queries.getAllSouvenirs();
+        // const result = await queries.getAllSouvenirs();
         // const result = await queries.getCheapSouvenirs(2900);
         // const result = await queries.getTopRatingSouvenirs(10);
         // const result = await queries.getSouvenirsByTag('техника');
@@ -26,10 +28,10 @@ const Queries = require('./queries');
         // const result = await queries.getDisscusedSouvenirs(Date());
         // const result = await queries.deleteOutOfStockSouvenirs();
         // const result = await queries.addReview('5abe65524d0c9d02c12eafb8',
-        //     { login: 'spt30', rating: '2', text: 'Спасибо, все отлично (нет)' });
+        // { login: 'spt30', rating: '4.2q', text: 'Спасибо, все отлично (нет4)' });
         // const result = await queries.getCartSum('punisher');
 
-        // console.log(result);
+        // console.log(result[0]);
 
     } catch (error) {
         console.error(error);
