@@ -13,7 +13,7 @@ const Queries = require('./queries');
 
     try {
         // Здесь можно делать запросы, чтобы проверять, что они правильно работают
-        // const result = await queries.getAllSouvenirs();
+        await queries.getAllSouvenirs();
         // const result = await queries.getCheapSouvenirs(2900);
         // const result = await queries.getTopRatingSouvenirs(10);
         // const result = await queries.getSouvenirsByTag('техника');
@@ -27,7 +27,7 @@ const Queries = require('./queries');
         // const result = await queries.deleteOutOfStockSouvenirs();
         // const result = await queries.addReview('5abe65524d0c9d02c12eafb8',
         //     { login: 'spt30', rating: '2', text: 'Спасибо, все отлично (нет)' });
-        await queries.getCartSum('punisher');
+        // const result = await queries.getCartSum('punisher');
 
         // console.log(result);
 

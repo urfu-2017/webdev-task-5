@@ -180,6 +180,8 @@ module.exports = class Queries {
             });
         });
 
-        return items.reduce((sum, item) => sum + item.price * item.amount, 0);
+        const filterItems = items.filter(item => item.hasOwnProperty('price'));
+
+        return filterItems.reduce((sum, item) => sum + item.price * item.amount, 0);
     }
 };
