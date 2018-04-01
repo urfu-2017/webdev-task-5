@@ -2,19 +2,10 @@
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
-        const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            id: mongoose.Schema.Types.ObjectId,
-            login: String,
-            date: Date,
-            text: String,
-            rating: Number,
-            isApproved: Boolean
-        });
-
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
-            reviews: [reviewSchema],
+            reviews: [mongoose.Schema.Types.Mixed],
             name: String,
             image: String,
             price: { type: Number, index: true },
@@ -124,7 +115,7 @@ module.exports = class Queries {
         });
         const ratings = souvenir.reviews.map(review => review.rating);
         souvenir.rating = ratings.reduce((a, b) => a + b, 0) / ratings.length;
-        // await souvenir.save();
+        await souvenir.save();
     }
 
     async getCartSum(login) {
