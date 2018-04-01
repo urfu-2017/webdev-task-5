@@ -21,9 +21,9 @@ module.exports = class Queries {
                 isApproved: Boolean
             }],
             image: String,
-            price: { type: Number, min: 0, index: true },
-            amount: { type: Number, min: 0, index: true },
-            country: { type: String, index: true },
+            price: PositiveNumber,
+            amount: PositiveNumber,
+            country: String,
             rating: PositiveNumber,
             isRecent: Boolean
 
@@ -80,7 +80,7 @@ module.exports = class Queries {
     // поэтому учтите это при определении схем
     getSouvenrisCount({ country, rating, price }) {
         return this._Souvenir
-            .find({
+            .count({
                 country,
                 rating: { $gte: rating },
                 price: { $lte: price }
