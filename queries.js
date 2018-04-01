@@ -94,7 +94,7 @@ module.exports = class Queries {
     getDisscusedSouvenirs(date) {
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
-        return this._Souvenir.find({ 'reviews.0.date': { $lte: date } });
+        return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
     }
 
     async deleteOutOfStockSouvenirs() {
@@ -142,7 +142,7 @@ module.exports = class Queries {
 
         const prices = await Promise.all(
             items.map(item => this._Souvenir
-                .findOne({ _id: item.souvenirId }, { price: 1, _id: 0 })
+                .find({ _id: item.souvenirId }, { price: 1, _id: 0 })
                 .then(souvenir => souvenir.price * item.amount))
         );
 
