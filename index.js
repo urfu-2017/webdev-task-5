@@ -12,12 +12,19 @@ const Queries = require('./queries');
     });
 
     try {
-        const result = await queries.addReview('5abe65514d0c9d02c12eaf55',
+        const result = await queries.addReview(
+            '5abe65514d0c9d02c12eaf56',
             {
-                login: 'check',
-                rating: 4,
-                text: 'gooo'
+                login: 'a',
+                text: 'b',
+                rating: 3
             });
+            // '5abe65514d0c9d02c12eaf55',
+            // {
+            //     login: 'check',
+            //     rating: 4,
+            //     text: 'gooo'
+            // });
 
         console.info(result);
     } catch (error) {

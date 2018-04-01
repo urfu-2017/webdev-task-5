@@ -6,7 +6,6 @@ module.exports = class Queries {
             tags: [String],
             reviews: [
                 {
-                    id: String,
                     login: String,
                     date: Date,
                     text: String,
@@ -20,8 +19,7 @@ module.exports = class Queries {
             amount: Number,
             country: { type: String, index: true },
             rating: { type: Number, index: true },
-            isRecent: Boolean,
-            __v: Number
+            isRecent: Boolean
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
@@ -31,8 +29,7 @@ module.exports = class Queries {
                     amount: Number
                 }
             ],
-            login: { type: String, unique: true },
-            __v: Number
+            login: { type: String, unique: true }
         });
 
         this._Souvenir = mongoose.model('Souvenir', souvenirSchema, souvenirsCollection);
@@ -149,6 +146,9 @@ module.exports = class Queries {
         return this._Souvenir
             .findById(souvenirId)
             .then(souvenir => {
+                if (!souvenir) {
+                    return;
+                }
                 souvenir.reviews.push(
                     {
                         login,
@@ -177,6 +177,9 @@ module.exports = class Queries {
         return this._Cart
             .findOne({ login })
             .then(cart => {
+                if (!cart) {
+                    return 0;
+                }
                 const promises = cart.items.reduce((accumulator, cartItem) => {
                     const promise = this._Souvenir.findById(cartItem.souvenirId)
                         .then(souvenir => (souvenir) ? souvenir.price * cartItem.amount : 0);
