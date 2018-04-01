@@ -119,21 +119,6 @@ module.exports = class Queries {
         // (то есть amount = 0)
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
-        const souvenirsForDelete = await this._Souvenir.find({ amount: 0 }, { _id: 1 });
-        if (souvenirsForDelete.length !== 0) {
-            const idInCart = souvenirsForDelete.map(item => {
-                return {
-                    'items.souvenirId': item._id
-                };
-            });
-            const deleteFromCart = await this._Cart.deleteMany({ $or: idInCart });
-            const deleteFromStorage = await this._Souvenir.deleteMany({ amount: 0 });
-
-            return {
-                ok: 1,
-                n: deleteFromCart.n + deleteFromStorage.n
-            };
-        }
 
         return await this._Souvenir.deleteMany({ amount: 0 });
     }
