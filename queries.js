@@ -70,7 +70,7 @@ module.exports = class Queries {
 
         return this._Souvenir
             .find(
-                { tags: { $regex: `.*${tag}.*`, $options: 'i' } },
+                { tags: tag },
                 { _id: 0, name: 1, image: 1, price: 1 }
             );
     }
@@ -84,9 +84,9 @@ module.exports = class Queries {
 
         return this._Souvenir
             .count({
-                country,
+                price: { $lte: price },
                 rating: { $gte: rating },
-                price: { $lte: price }
+                country
             });
     }
 
@@ -105,7 +105,6 @@ module.exports = class Queries {
         // первый отзыв на которые был оставлен не раньше даты date
 
         return this._Souvenir.find({
-            'reviews.0': { $exists: true },
             'reviews.0.date': { $gte: date }
         });
     }
