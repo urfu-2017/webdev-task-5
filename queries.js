@@ -2,11 +2,11 @@
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
-        const souvenirSchema = mongoose.Schema({
+        const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема сувенира тут
         });
 
-        const cartSchema = mongoose.Schema({
+        const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема корзины тут
         });
 
