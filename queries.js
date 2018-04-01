@@ -103,17 +103,18 @@ module.exports = class Queries {
 
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
-        const souvenirs = await this._Souvenir.find({ amount: 0 }, { _id: 1 });
-        const ids = souvenirs.map(s => s.id);
+        // const souvenirs = await this._Souvenir.find({ amount: 0 }, { _id: 1 });
+        // const ids = souvenirs.map(s => s.id);
 
-        await Promise.all([
-            this._Souvenir.remove({ _id: { $in: ids } }),
-            this._Cart.update(
-                { items: { $elemMatch: { souvenirId: { $in: ids } } } },
-                { $pull: { items: { souvenirId: { $in: ids } } } }, { multi: true })
-        ]);
+        // await Promise.all([
+        //     this._Souvenir.remove({ _id: { $in: ids } }),
+        //     this._Cart.update(
+        //         { items: { $elemMatch: { souvenirId: { $in: ids } } } },
+        //         { $pull: { items: { souvenirId: { $in: ids } } } }, { multi: true })
+        // ]);
 
-        return { ok: 1, n: ids.length };
+        // return { ok: 1, n: ids.length };
+        return this._Souvenir.remove({ amount: 0 });
     }
 
     async addReview(souvenirId, { login, rating, text }) {
