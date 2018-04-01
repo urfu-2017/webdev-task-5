@@ -3,7 +3,7 @@
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            id: String,
+            id: mongoose.Schema.Types.ObjectId,
             login: String,
             date: Date,
             text: String,
