@@ -108,9 +108,11 @@ module.exports = class Queries {
     // date - текущая дата и isApproved - false
     // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
     async addReview(souvenirId, { login, rating, text }) {
-        const souvenir = await this._Souvenir.where('_id', souvenirId).exec();
+        const souvenir = (await this._Souvenir.where('_id', souvenirId).exec())[0];
         const date = new Date();
         const isApproved = false;
+
+        rating = Number(rating);
 
         const reviews = souvenir.reviews.concat({ login, text, rating, date, isApproved });
         const souvenirRating = reviews.reduce(
