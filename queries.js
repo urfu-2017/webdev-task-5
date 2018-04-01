@@ -5,31 +5,28 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewsSchema = mongoose.Schema({
             // id: ObjectId,
-            login: String,
-            // login: { type: String, required: true },
-            date: Date,
-            text: String,
-            rating: Number,
-            // text: { type: String, required: true },
-            // rating: { type: Number, required: true },
-            isApproved: Boolean
+            login: { type: String, required: true },
+            date: { type: Date, default: new Date() },
+            rating: { type: Number, min: 1, max: 5, required: true },
+            text: { type: String, required: true },
+            isApproved: { type: Boolean, default: false }
         });
         const souvenirSchema = mongoose.Schema({
             tags: [String],
             reviews: [reviewsSchema],
             name: String,
             image: String,
-            price: { type: Number, index: true },
-            amount: Number,
-            country: { type: String, index: true },
-            rating: { type: Number, index: true },
+            price: { type: Number, min: 0, index: true, required: true },
+            amount: { type: Number, min: 0, required: true },
+            country: { type: String, index: true, required: true },
+            rating: { type: Number, min: 1, max: 5, required: true, index: true },
             isRecent: Boolean,
             __v: Number
         });
 
         const itemInCartSchema = mongoose.Schema({
             // souvenirId: ObjectId,
-            amount: Number
+            amount: { type: Number, min: 0, required: true }
         });
 
         const cartSchema = mongoose.Schema({
@@ -49,6 +46,7 @@ module.exports = class Queries {
         // Данный метод должен возвращать все сувениры
 
         return this._Souvenir.find();
+        // return this._Souvenir.find({ _id: '5abe65524d0c9d02c12eafb8' });
     }
 
     getCheapSouvenirs(price) {
@@ -137,10 +135,8 @@ module.exports = class Queries {
 
         reviews.push({
             login: String(login),
-            date: new Date(),
             text: String(text),
-            rating: parseFloat(rating),
-            isApproved: false
+            rating: parseFloat(rating)
         });
 
         const newRating = reviews.reduce((currentRating, review, index) => {
