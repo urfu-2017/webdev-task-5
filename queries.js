@@ -30,7 +30,7 @@ module.exports = class Queries {
     }
 
     getAllSouvenirs() {
-        return this._Souvenir.find({ _id: '5abe65514d0c9d02c12eafb1' }).then(res => res[0].reviews);
+        return this._Souvenir.find();
     }
 
     getCheapSouvenirs(price) {
