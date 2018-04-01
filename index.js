@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 const Queries = require('./queries');
 
-(async function () {
+(async () => {
     await mongoose.connect('mongodb://localhost/webdev-task-5');
 
     const queries = new Queries(mongoose, {
@@ -30,6 +30,7 @@ const Queries = require('./queries');
         await queries.getCartSum('punisher');
 
         // console.log(result);
+
     } catch (error) {
         console.error(error);
     }
