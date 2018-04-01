@@ -114,13 +114,13 @@ module.exports = class Queries {
         });
     }
 
-    async deleteOutOfStockSouvenirs() {
+    deleteOutOfStockSouvenirs() {
         // Данный метод должен удалять все сувениры, которых нет в наличии
         // (то есть amount = 0)
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
 
-        return await this._Souvenir.deleteMany({ amount: 0 });
+        return this._Souvenir.deleteMany({ amount: 0 });
     }
 
     async addReview(souvenirId, { login, rating, text }) {
