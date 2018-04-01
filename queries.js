@@ -173,11 +173,11 @@ module.exports = class Queries {
 
         items.forEach(item => {
             const cartId = item._doc.souvenirId;
-            const amount = item.amount;
             prices.forEach(priceObj => {
-                const price = priceObj.price;
                 const storageId = priceObj._id;
                 if (String(cartId) === String(storageId)) {
+                    const amount = Math.min(item.amount, priceObj.amount);
+                    const price = priceObj.price;
                     sum += price * amount;
                 }
             });
