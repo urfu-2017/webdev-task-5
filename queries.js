@@ -112,12 +112,9 @@ module.exports = class Queries {
         const date = new Date();
         const isApproved = false;
 
-        rating = Number(rating);
-
+        const souvenirRating =
+            (souvenir.rating * souvenir.reviews.length + rating) / (souvenir.reviews.length + 1);
         const reviews = souvenir.reviews.concat({ login, text, rating, date, isApproved });
-        const souvenirRating = reviews.reduce(
-            (result, review) => result + review.rating, 0
-        ) / souvenir.reviews.length;
 
         return this._Souvenir
             .where('_id', souvenir)
@@ -133,20 +130,21 @@ module.exports = class Queries {
         const items = cart[0].items;
         const souvenirIds = items.map(item => item.souvenirId);
 
-        const souvenirs = await this._Souvenir
+        const souvenirs = (await this._Souvenir
             .where('_id').in(souvenirIds)
-            .select('price')
-            .exec();
+            .select('_id price amount')
+            .exec())
+            .reduce((result, souvenir) => {
+                result[souvenir._id] = souvenir;
 
-        const souvenirsPrice = souvenirs.reduce((map, souvenir) => {
-            map[souvenir._id] = souvenir.price;
+                return result;
+            }, {});
 
-            return map;
-        }, {});
+        return items.reduce((total, item) => {
+            const souvenir = souvenirs[item.souvenirId] || { price: 0, amount: 0 };
+            const amount = Math.min(item.amount, souvenir.amount);
 
-        return items.reduce(
-            (total, item) => total + souvenirsPrice[item.souvenirId] * item.amount,
-            0
-        );
+            return total + souvenir.price * amount;
+        }, 0);
     }
 };
