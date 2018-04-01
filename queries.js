@@ -120,11 +120,12 @@ module.exports = class Queries {
     async addReview(souvenirId, { login, rating, text }) {
         const id = uuidv4();
         const date = new Date();
+        const isApproved = false;
         // note: explicit cast is required due to https://github.com/Automattic/mongoose/issues/1399
         // eslint-disable-next-line new-cap
         const souvenir = { _id: Types.ObjectId(souvenirId) };
         await this._Souvenir.findOneAndUpdate(souvenir,
-            { $push: { reviews: { login, id, text, rating, date } } }
+            { $push: { reviews: { login, id, text, rating, date, isApproved } } }
         );
         const aggregateResult = await this._Souvenir.aggregate([
             { $match: souvenir },
