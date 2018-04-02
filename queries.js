@@ -134,7 +134,10 @@ module.exports = class Queries {
             });
         });
         await this._Souvenir.find({ _id: { $in: ids } }).then(res => {
-            total = res.reduce((acc, souvenir, idx) => acc + souvenir.price * amounts[idx]);
+            amounts.reverse();
+            total = res.reduce((acc, souvenir, idx) => {
+                return acc + souvenir.price * amounts[idx];
+            }, 0);
         });
 
         return total;
