@@ -104,14 +104,13 @@ module.exports = class Queries {
         let rates = 0;
         await this._Souvenir.find({ _id: souvenirId })
             .then(entryArr => {
+                oldRating = entryArr[0].rating;
                 const reviews = entryArr[0].reviews;
-                reviews.forEach(comment => {
-                    oldRating += comment.rating;
-                    rates++;
-                });
+                rates = reviews.length;
             })
             .then(() => {
-                const updatedRating = (oldRating + Number(rating)) / (Number(rates) + 1);
+                const updatedRating = (oldRating * Number(rates) +
+                    Number(rating)) / (Number(rates) + 1);
                 this._Souvenir.update({ _id: souvenirId },
                     { $set: { rating: updatedRating } })
                     .then(() => this._Souvenir.update(
