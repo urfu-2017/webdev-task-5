@@ -137,7 +137,7 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-        const souvenir = await this._Souvenir.find({
+        const souvenir = await this._Souvenir.findOne({
             _id: souvenirId
         });
         const newRating = (souvenir
