@@ -2,6 +2,9 @@
   "private": true,
   "main": "index.js",
   "scripts": {
+    "ss": "C:\\PROGRA~1\\MongoDB\\Server\\3.6\\bin\\mongod.exe",
+    "ee": "C:\\PROGRA~1\\MongoDB\\Server\\3.6\\bin\\mongorestore.exe",
+    "rr": "rd /S /Q C:\\data\\db && md C:\\data\\db",
     "lint": "eslint .",
     "test": "npm run lint && mocha */*.spec.js"
   },

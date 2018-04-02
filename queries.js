@@ -1,5 +1,5 @@
 'use strict';
-
+/* eslint-disable new-cap */
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({
