@@ -7,6 +7,7 @@ module.exports = class Queries {
             tags: [mongoose.Schema.Types.String],
             name: mongoose.Schema.Types.String,
             reviews: [mongoose.Schema({ // eslint-disable-line new-cap
+                _id: mongoose.Schema.Types.ObjectId,
                 login: mongoose.Schema.Types.String,
                 data: mongoose.Schema.Types.Date,
                 text: mongoose.Schema.Types.String,
@@ -48,10 +49,7 @@ module.exports = class Queries {
 
     // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
     getTopRatingSouvenirs(n) {
-        return this._Souvenir
-            .sort('-rating')
-            .limit(n)
-            .exec();
+        return this._Souvenir.find().sort('-rating').limit(n);
     }
 
 
@@ -108,18 +106,16 @@ module.exports = class Queries {
     // date - текущая дата и isApproved - false
     // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
     async addReview(souvenirId, { login, rating, text }) {
-        const souvenir = (await this._Souvenir.where('_id', souvenirId).exec())[0];
+        const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
+
         const date = new Date();
         const isApproved = false;
+        const reviewCount = souvenir.reviews.length;
 
-        const souvenirRating =
-            (souvenir.rating * souvenir.reviews.length + rating) / (souvenir.reviews.length + 1);
-        const reviews = souvenir.reviews.concat({ login, text, rating, date, isApproved });
+        souvenir.rating = (souvenir.rating * reviewCount + rating) / (reviewCount + 1);
+        souvenir.reviews.push({ login, text, rating, date, isApproved });
 
-        return this._Souvenir
-            .where('_id', souvenir)
-            .update({ $set: { reviews, rating: souvenirRating } })
-            .exec();
+        return souvenir.save();
     }
 
     // Данный метод должен считать общую стоимость корзины пользователя login
