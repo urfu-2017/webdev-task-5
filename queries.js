@@ -2,18 +2,18 @@
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
+        const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            id: String,
+            login: String,
+            date: Date,
+            text: String,
+            rating: Number,
+            isApproved: Boolean
+        });
+
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             tags: [String],
-            reviews: [
-                {
-                    id: mongoose.Schema.Types.ObjectId,
-                    login: String,
-                    date: Date,
-                    text: String,
-                    rating: Number,
-                    isApproved: Boolean
-                }
-            ],
+            reviews: [reviewSchema],
             name: String,
             image: String,
             price: Number,

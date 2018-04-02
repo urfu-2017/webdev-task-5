@@ -12,7 +12,14 @@ const Queries = require('./queries');
     });
 
     try {
-        const result = await queries.getTopRatingSouvenirs(-1);
+        const result = await queries.addReview(
+            '5abe65514d0c9d02c12eaf55',
+            {
+                login: 'lala',
+                text: 'text',
+                rating: 4
+            }
+        );
 
         console.info(result);
     } catch (error) {
