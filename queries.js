@@ -111,7 +111,7 @@ module.exports = class Queries {
                 });
             })
             .then(() => {
-                const updatedRating = (oldRating + Number(rating)) / (rates + 1);
+                const updatedRating = (oldRating + Number(rating)) / (Number(rates) + 1);
                 this._Souvenir.update({ _id: souvenirId },
                     { $set: { rating: updatedRating } })
                     .then(() => this._Souvenir.update(
