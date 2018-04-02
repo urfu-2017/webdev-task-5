@@ -100,21 +100,18 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-        let oldRating = 0;
-        let rates = 0;
         let updatedReviews = [];
         let updatedRating = 0;
         await this._Souvenir.find({ _id: souvenirId })
             .then(entryArr => {
-                oldRating = entryArr[0].rating;
                 const reviews = entryArr[0].reviews;
-                rates = reviews.length;
                 reviews.push({
                     login, date: new Date(), text, rating, isApproved: false
                 });
                 updatedReviews = reviews;
-                updatedRating = (oldRating * Number(rates) +
-                    Number(rating)) / (Number(rates) + 1);
+                updatedRating = reviews.reduce((acc, entry, idx) => {
+                    return (acc * idx + entry.rating) / (idx + 1);
+                }, 0);
             });
         await this._Souvenir.update({ _id: souvenirId },
             { $set: { rating: updatedRating, reviews: updatedReviews } });
