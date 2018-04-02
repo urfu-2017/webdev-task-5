@@ -1,36 +1,39 @@
+/* eslint-disable */
 'use strict';
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
-        const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
+        const souvenirSchema = mongoose.Schema({
+            _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
-            reviews: [{
-                id: String,
+            reviews: [mongoose.Schema({
+                _id: mongoose.Schema.Types.ObjectId,
                 login: String,
                 date: Date,
                 text: String,
                 rating: Number,
                 isApproved: Boolean
-            }],
+            })],
             name: String,
             image: String,
-            price: Number,
+            price: { type: Number, index: true },
             amount: Number,
-            country: String,
-            rating: Number,
+            country: { type: String, index: true },
+            rating: { type: Number, index: true },
             isRecent: Boolean,
             __v: Number
         });
 
-        const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            items: [{
+        const cartSchema = mongoose.Schema({
+            _id: mongoose.Schema.Types.ObjectId,
+            items: [mongoose.Schema({
                 souvenirId: {
                     type: mongoose.Schema.Types.ObjectId,
                     ref: 'Souvenir',
                     alias: 'souvenir'
                 },
                 amount: Number
-            }],
+            })],
             login: { type: String, unique: true },
             __v: Number
         });
@@ -103,23 +106,24 @@ module.exports = class Queries {
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
         const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
+        souvenir.rating = (souvenir.rating * souvenir.reviews.length + rating) / (souvenir.reviews.length + 1);
         souvenir.reviews.push({
             login,
             text,
             rating,
-            isApproved: false, date: new Date()
+            isApproved: false,
+            date: new Date()
         });
-        souvenir.rating = (souvenir.reviews
-            .reduce((acc, x) => x.rating + acc, 0) / souvenir.reviews.length);
-        await souvenir.save();
+
+        return await souvenir.save();
     }
 
     async getCartSum(login) {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        const cart = await this._Cart.findOne({ login }).populate('items.souvenirId');
+        const cart = await this._Cart.findOne({ login }).populate('items.souvenirId', 'price');
 
-        return cart.items.reduce((acc, item) => item.amount * item.souvenir.price, 0);
+        return cart.items.reduce((acc, item) => acc + item.amount * item.souvenirId.price, 0);
     }
 };
