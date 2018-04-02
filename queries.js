@@ -3,15 +3,17 @@
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            _id: mongoose.Schema.Types.ObjectId,
             login: { type: String, required: true },
             rating: { type: Number, min: 1, max: 5, required: true },
             text: { type: String, required: true },
             date: { type: Date, default: () => new Date() },
             isApproved: { type: Boolean, default: false }
-        }, { _id: false });
+        });
 
-        const souvenirSchema = new mongoose.Schema({
+        const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема сувенира тут
+            _id: mongoose.Schema.Types.ObjectId,
             country: { type: String, index: true },
             name: { type: String, required: true },
             price: { type: Number, min: 0, required: true },
@@ -19,20 +21,20 @@ module.exports = class Queries {
             image: String,
             isRecent: Boolean,
             tags: [String],
-            reviews: [mongoose.Schema.Types.Mixed],
+            reviews: [reviewSchema],
             rating: { type: Number, min: 1, max: 5 }
+        });
+
+        const cartItemSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            souvenirId: mongoose.Schema.Types.ObjectId,
+            amount: { type: Number, min: 0, required: true }
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема корзины тут
+            _id: mongoose.Schema.Types.ObjectId,
             login: { type: String, unique: true },
-            items: {
-                type: Array,
-                $items: {
-                    souvenirId: { type: mongoose.Types.ObjectId, required: true },
-                    amount: { type: Number, min: 0, required: true }
-                }
-            }
+            items: [cartItemSchema]
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
@@ -76,11 +78,11 @@ module.exports = class Queries {
 
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
-        return this._Souvenir.find({
+        return this._Souvenir.count({
             country,
             rating: { $gte: rating },
             price: { $lte: price }
-        }).count();
+        });
     }
 
     searchSouvenirs(substring) {
