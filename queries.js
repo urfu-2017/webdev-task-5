@@ -2,7 +2,7 @@
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
-        const reviewSchema = new mongoose.Schema({
+        const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
             login: { type: String, required: true },
             rating: { type: Number, min: 1, max: 5, required: true },
             text: { type: String, required: true },
@@ -19,9 +19,7 @@ module.exports = class Queries {
             image: String,
             isRecent: Boolean,
             tags: [String],
-            reviews: {
-                type: [reviewSchema]
-            },
+            reviews: [mongoose.Schema.Types.Mixed],
             rating: { type: Number, min: 1, max: 5 }
         });
 
