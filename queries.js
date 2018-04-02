@@ -16,10 +16,10 @@ module.exports = class Queries {
             reviews: [reviewSchema],
             name: String,
             image: String,
-            price: Number,
+            price: { type: Number, index: true },
             amount: Number,
-            country: String,
-            rating: Number,
+            country: { type: String, index: true },
+            rating: { type: Number, index: true },
             isRecent: Boolean
         });
 
@@ -77,8 +77,7 @@ module.exports = class Queries {
      * @returns {Query}
      */
     getSouvenirsByTag(tag) {
-        return this._Souvenir.find({ tags: { $elemMatch: { $eq: tag } } },
-            { name: 1, image: 1, price: 1, _id: 0 });
+        return this._Souvenir.find({ tags: tag }, { name: 1, image: 1, price: 1, _id: 0 });
     }
 
 
@@ -147,23 +146,18 @@ module.exports = class Queries {
         return this._Souvenir
             .findById(souvenirId)
             .then(souvenir => {
-                if (!souvenir) {
-                    return;
-                }
                 souvenir.reviews.push(
                     {
-                        id: 'some-id',
                         login,
                         rating,
                         text,
                         date: new Date(),
                         isApproved: false
-                        // id: 'some random id'
                     }
                 );
-                let overallRating = 0;
-                /* eslint-disable-next-line no-return-assign*/
-                souvenir.reviews.forEach(review => overallRating += review.rating);
+                let overallRating = souvenir.reviews.reduce((accumulator, review) => {
+                    return accumulator + review.rating;
+                }, 0);
                 souvenir.rating = overallRating / souvenir.reviews.length;
 
                 return souvenir.save();
@@ -179,12 +173,9 @@ module.exports = class Queries {
         return this._Cart
             .findOne({ login })
             .then(cart => {
-                if (!cart) {
-                    return 0;
-                }
                 const promises = cart.items.reduce((accumulator, cartItem) => {
                     const promise = this._Souvenir.findById(cartItem.souvenirId)
-                        .then(souvenir => (souvenir) ? souvenir.price * cartItem.amount : 0);
+                        .then(souvenir => souvenir.price * cartItem.amount);
                     accumulator.push(promise);
 
                     return accumulator;
