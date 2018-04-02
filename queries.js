@@ -43,6 +43,10 @@ module.exports = class Queries {
         return this._Souvenir.find();
     }
 
+    getSouvenirByID(id) {
+        return this._Souvenir.find({ _id: id });
+    }
+
     getCheapSouvenirs(price) {
         return this._Souvenir.find({ price: { $lte: price } });
     }
@@ -107,7 +111,7 @@ module.exports = class Queries {
                 });
             })
             .then(() => {
-                const updatedRating = (oldRating + rating) / (rates + 1);
+                const updatedRating = (oldRating + Number(rating)) / (rates + 1);
                 this._Souvenir.update({ _id: souvenirId },
                     { $set: { rating: updatedRating } })
                     .then(() => this._Souvenir.update(
