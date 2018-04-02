@@ -2,12 +2,17 @@
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
+        const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            login: String,
+            date: Date,
+            text: String,
+            rating: Number,
+            isApproved: Boolean
+        });
+
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             tags: [String],
-            reviews: [{
-                login: String, date: Date,
-                text: String, rating: Number, isApproved: Boolean
-            }],
+            reviews: [reviewSchema],
             name: String,
             image: String,
             price: { type: Number, index: true },
@@ -18,9 +23,14 @@ module.exports = class Queries {
             // Ваша схема сувенира тут
         });
 
+        const itemSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            souvenirId: String,
+            amount: Number
+        });
+
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема корзины тут
-            items: [{ souvenirId: String, amount: Number }],
+            items: [itemSchema],
             login: { type: String, unique: true }
         });
 
@@ -69,35 +79,15 @@ module.exports = class Queries {
     getDisscusedSouvenirs(date) {
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
-        const resArr = [];
-
-        return this._Souvenir.find({}, { _id: 1, reviews: 1 })
-            .then(res => {
-                res.forEach(entry => {
-                    if (entry.reviews[entry.reviews.length - 1] &&
-                        new Date(entry.reviews[entry.reviews.length - 1].date) >= new Date(date)) {
-                        resArr.push(entry._id.toString());
-                    }
-                });
-            })
-            .then(() => this._Souvenir.find({ _id: { $in: resArr } }));
+        return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
     }
 
     deleteOutOfStockSouvenirs() {
         // Данный метод должен удалять все сувениры, которых нет в наличии
         // (то есть amount = 0)
-        let deletedSouvenirs = 0;
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
-
-        return this._Souvenir.find({ amount: 0 })
-            .then(res => {
-                deletedSouvenirs = res.length;
-            })
-            .then(() => this._Souvenir.remove({ amount: 0 }))
-            .then(() => {
-                return { ok: 1, n: deletedSouvenirs };
-            });
+        return this._Souvenir.remove({ amount: 0 });
     }
 
     async addReview(souvenirId, { login, rating, text }) {
