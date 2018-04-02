@@ -102,28 +102,22 @@ module.exports = class Queries {
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
         let oldRating = 0;
         let rates = 0;
+        let updatedReviews = [];
+        let updatedRating = 0;
         await this._Souvenir.find({ _id: souvenirId })
             .then(entryArr => {
                 oldRating = entryArr[0].rating;
                 const reviews = entryArr[0].reviews;
                 rates = reviews.length;
-            })
-            .then(() => {
-                const updatedRating = (oldRating * Number(rates) +
+                reviews.push({
+                    login, date: new Date(), text, rating, isApproved: false
+                });
+                updatedReviews = reviews;
+                updatedRating = (oldRating * Number(rates) +
                     Number(rating)) / (Number(rates) + 1);
-                this._Souvenir.update({ _id: souvenirId },
-                    { $set: { rating: updatedRating } })
-                    .then(() => this._Souvenir.update(
-                        { _id: souvenirId },
-                        {
-                            $push: {
-                                reviews: {
-                                    login, date: new Date(), text, rating, isApproved: false
-                                }
-                            }
-                        }
-                    ));
             });
+        await this._Souvenir.update({ _id: souvenirId },
+            { $set: { rating: updatedRating, reviews: updatedReviews } });
     }
 
     async getCartSum(login) {
