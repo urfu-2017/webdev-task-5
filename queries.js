@@ -5,7 +5,7 @@ const { Types } = require('mongoose');
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: { type: Types.ObjectId, require: true },
+            _id: { type: mongoose.Schema.Types.ObjectId },
             tags: { type: [String], required: true },
             reviews: { type: Array, $items: {
                 id: { type: String, required: true },
@@ -27,9 +27,9 @@ module.exports = class Queries {
         souvenirSchema.index({ _id: 1, price: -1, rating: 1 });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: { type: Types.ObjectId, require: true },
+            _id: { type: mongoose.Schema.Types.ObjectId, require: true },
             items: { type: Array, $items: {
-                souvenirId: { type: mongoose.Types.ObjectId, required: true },
+                souvenirId: { type: mongoose.Schema.Types.ObjectId, required: true },
                 amount: { type: Number, required: true }
             }, required: true },
             login: { type: String, required: true, unique: true }
@@ -87,7 +87,6 @@ module.exports = class Queries {
     }
 
     deleteOutOfStockSouvenirs() {
-
         return this._Souvenir
             .remove({ amount: 0 });
     }
