@@ -137,7 +137,7 @@ module.exports = class Queries {
             .unwind('items')
             .replaceRoot('items')
             .lookup({
-                from: 'souvenirs',
+                from: this._Souvenir.collection.name,
                 localField: 'souvenirId',
                 foreignField: '_id',
                 as: 'souvenirs'
