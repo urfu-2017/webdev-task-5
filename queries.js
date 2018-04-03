@@ -57,7 +57,7 @@ module.exports = class Queries {
     }
 
     getSouvenirsByTag(tag) {
-        return this._Souvenir.find({ tags: tag }, { name: 1, image: 1, price: 1 });
+        return this._Souvenir.find({ tags: tag }, { _id: 0, name: 1, image: 1, price: 1 });
     }
 
     getSouvenrisCount({ country, rating, price }) {

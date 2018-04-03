@@ -13,7 +13,8 @@ const Queries = require('./queries');
 
     try {
         // Здесь можно делать запросы, чтобы проверять, что они правильно работают
-        const result = await queries.getDisscusedSouvenirs(new Date(2018, 2, 1));
+        const result = await queries.getSouvenrisCount(
+            { country: 'Италия', rating: 4, price: 2500 });
 
         console.info(result);
     } catch (error) {
