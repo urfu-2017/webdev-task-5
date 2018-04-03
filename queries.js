@@ -98,7 +98,7 @@ module.exports = class Queries {
         souvenir[0].reviews.forEach(review => {
             sum += review.rating;
         });
-        let newRating = sum / souvenir[0].reviews.length + 1;
+        let newRating = sum / (souvenir[0].reviews.length + 1);
         await this._Souvenir.update(
             { _id: new Types.ObjectId(souvenirId) },
             { $set: { rating: newRating }, $push: { reviews: {
