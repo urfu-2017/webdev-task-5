@@ -68,6 +68,7 @@ module.exports = class Queries {
     getDisscusedSouvenirs(date) {
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
+        return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
     }
 
     deleteOutOfStockSouvenirs() {
@@ -85,11 +86,34 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
+
+        const souvenir = await this._Souvenir.findById(souvenirId);
+        souvenir.rating = (souvenir.rating * souvenir.reviews.length + rating) / (souvenir.reviews.length + 1);
+            souvenir.reviews.push(
+                {
+                    login,
+                    rating,
+                    text,
+                    date: new Date(),
+                    isApproved: false
+                }
+            );
+        return await souvenir.save();
     }
 
     async getCartSum(login) {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
+        return this._Cart.findOne({ login })
+            .then(async user => {
+                let res = 0;
+                for (var i = 0; i < user.items.length; i++) {
+                    const souvenir = await this._Souvenir.findById(user.items[i].souvenirId);
+                    res += souvenir.price * user.items[i].amount;
+                }
+
+                return res;
+            });
     }
 };
