@@ -28,12 +28,13 @@ module.exports = class Queries {
         });
         souvenirSchema.index({ country: 1, rating: 1, price: 1 });
 
+        const cartItemSchema = schema({
+            souvenirId: ObjectId,
+            amount: PositiveNumber
+        });
         const cartSchema = schema({
             login: { type: String, unique: true },
-            items: [{
-                souvenirId: ObjectId,
-                amount: PositiveNumber
-            }]
+            items: [cartItemSchema]
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
