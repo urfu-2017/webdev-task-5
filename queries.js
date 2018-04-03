@@ -149,6 +149,10 @@ module.exports = class Queries {
             });
 
 
-        return result[0].cost;
+        if (result.length > 0) {
+            return result[0].cost;
+        }
+
+        return 0;
     }
 };

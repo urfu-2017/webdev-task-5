@@ -23,7 +23,7 @@ const Queries = require('./queries');
         // const result = await queries.addReview('5abe65514d0c9d02c12eaf91', {
         //     login: 'kekmachine', text: 'ololosha', rating: 1
         // });
-        const result = await queries.getCartSum('justice');
+        const result = await queries.getCartSum('funnysguy');
         console.info(result);
     } catch (error) {
         console.error(error);
