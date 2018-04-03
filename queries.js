@@ -40,7 +40,7 @@ module.exports = class Queries {
     }
 
     getCheapSouvenirs(price) {
-        return this._Souvenir.find({ $lte: price });
+        return this._Souvenir.find({ price: { $lte: price } });
     }
 
     getTopRatingSouvenirs(n) {
