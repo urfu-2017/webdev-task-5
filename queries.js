@@ -72,7 +72,7 @@ module.exports = class Queries {
     }
 
     searchSouvenirs(substring) {
-        return this._Souvenir.find({ $regex: substring });
+        return this._Souvenir.find({ $regex: new RegExp(substring, 'i') });
     }
 
     getDisscusedSouvenirs(date) {
