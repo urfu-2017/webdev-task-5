@@ -1,6 +1,5 @@
 'use strict';
 
-const uuidv4 = require('uuid/v4');
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const schema = mongoose.Schema;
@@ -8,13 +7,13 @@ module.exports = class Queries {
         const PositiveNumber = { type: Number, min: 0 };
 
         const reviewSchema = schema({
-            id: String,
+            _id: ObjectId,
             login: String,
             date: Date,
             text: String,
             rating: PositiveNumber,
             isApproved: Boolean
-        }, { _id: false });
+        });
         const souvenirSchema = schema({
             name: String,
             tags: [String],
@@ -118,7 +117,7 @@ module.exports = class Queries {
     // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
     async addReview(souvenirId, { login, rating, text }) {
         const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
-        const review = { login, text, rating, id: uuidv4(), date: new Date(), isApproved: false };
+        const review = { login, text, rating, date: new Date(), isApproved: false };
 
         const reviewsCount = souvenir.reviews.length;
         souvenir.rating = (souvenir.rating * reviewsCount + rating) / (reviewsCount + 1);
