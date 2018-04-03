@@ -34,7 +34,8 @@ module.exports = class Queries {
             }],
             login: {
                 type: String,
-                unique: true
+                unique: true,
+                index: true
             }
         });
 
@@ -97,7 +98,7 @@ module.exports = class Queries {
                 price: {
                     $lte: price
                 }
-            });
+            }).count();
     }
 
     searchSouvenirs(substring) {
