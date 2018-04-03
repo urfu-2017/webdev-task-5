@@ -118,28 +118,14 @@ module.exports = class Queries {
     // date - текущая дата и isApproved - false
     // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
     async addReview(souvenirId, { login, rating, text }) {
-        const id = uuidv4();
-        const date = new Date();
-        const isApproved = false;
-        // note: explicit cast is required due to https://github.com/Automattic/mongoose/issues/1399
-        // eslint-disable-next-line new-cap
-        const souvenir = { _id: Types.ObjectId(souvenirId) };
-        await this._Souvenir.findOneAndUpdate(souvenir,
-            { $push: { reviews: { login, id, text, rating, date, isApproved } } }
-        );
-        const aggregateResult = await this._Souvenir
-            .aggregate()
-            .match(souvenir)
-            .unwind('reviews')
-            .replaceRoot('reviews')
-            .group({
-                _id: null,
-                rating: { $avg: '$rating' }
-            });
+        const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
+        const review = { login, text, rating, id: uuidv4(), date: new Date(), isApproved: false };
 
-        await this._Souvenir.findOneAndUpdate(souvenir,
-            { $set: { rating: aggregateResult[0].rating } }
-        );
+        const reviewsCount = souvenir.reviews.length;
+        souvenir.rating = (souvenir.rating * reviewsCount + rating) / (reviewsCount + 1);
+        souvenir.reviews.push(review);
+
+        return souvenir.save();
     }
 
     // Данный метод должен считать общую стоимость корзины пользователя login
