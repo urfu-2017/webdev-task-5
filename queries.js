@@ -143,7 +143,7 @@ module.exports = class Queries {
             { $unwind: '$items' },
             {
                 $lookup: {
-                    from: 'souvenirs',
+                    from: this._Souvenir.collection.name,
                     localField: 'items.souvenirId',
                     foreignField: '_id',
                     as: 'souvenirs'
