@@ -120,7 +120,7 @@ module.exports = class Queries {
         }
         await Promise.all(promises).then(values => {
             values.forEach(value => {
-                sum += value[0].price;
+                sum += value[0].price * cart[0].items[values.indexOf(value)].amount;
             });
         });
 
