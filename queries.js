@@ -1,7 +1,6 @@
 'use strict';
 
 const uuidv4 = require('uuid/v4');
-const { Types } = require('mongoose');
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const schema = mongoose.Schema;
