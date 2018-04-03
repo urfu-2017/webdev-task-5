@@ -76,7 +76,7 @@ module.exports = class Queries {
     }
 
     getDisscusedSouvenirs(date) {
-        return this._Souvenir.find({ 'reviews.date': { $gte: date } });
+        return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
     }
 
     deleteOutOfStockSouvenirs() {
