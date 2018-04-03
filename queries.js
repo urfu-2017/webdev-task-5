@@ -27,7 +27,7 @@ module.exports = class Queries {
         souvenirSchema.index({ _id: 1, price: -1, rating: 1 });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: { type: mongoose.Schema.Types.ObjectId, require: true },
+            _id: { type: mongoose.Schema.Types.ObjectId },
             items: { type: Array, $items: {
                 souvenirId: { type: mongoose.Schema.Types.ObjectId, required: true },
                 amount: { type: Number, required: true }
@@ -44,7 +44,7 @@ module.exports = class Queries {
     getAllSouvenirs() {
 
         return this._Souvenir
-            .find({});
+            .find();
     }
 
     getCheapSouvenirs(price) {
@@ -98,7 +98,7 @@ module.exports = class Queries {
         souvenir[0].reviews.forEach(review => {
             sum += review.rating;
         });
-        let newRating = sum / souvenir[0].reviews.length;
+        let newRating = sum / souvenir[0].reviews.length + 1;
         await this._Souvenir.update(
             { _id: new Types.ObjectId(souvenirId) },
             { $set: { rating: newRating }, $push: { reviews: {
