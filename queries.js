@@ -5,6 +5,7 @@ const { Types } = require('mongoose');
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            _id: { type: Types.ObjectId, require: true },
             tags: { type: [String], required: true },
             reviews: { type: Array, $items: {
                 id: { type: String, required: true },
@@ -26,6 +27,7 @@ module.exports = class Queries {
         souvenirSchema.index({ _id: 1, price: -1, rating: 1 });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            _id: { type: Types.ObjectId, require: true },
             items: { type: Array, $items: {
                 souvenirId: { type: mongoose.Types.ObjectId, required: true },
                 amount: { type: Number, required: true }
