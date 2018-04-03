@@ -148,8 +148,11 @@ module.exports = class Queries {
 
         return this._Souvenir
             .update({
-                _id: souvenirId,
-                rating: newRating,
+                _id: souvenirId
+            }, {
+                $set: {
+                    rating: newRating
+                },
                 $push: {
                     reviews: {
                         login,

@@ -14,9 +14,9 @@ const Queries = require('./queries');
 
     try {
         // Здесь можно делать запросы, чтобы проверять, что они правильно работают
-        const result = await queries.addReview('', {
+        const result = await queries.addReview('5abe65514d0c9d02c12eaf58', {
             login: 'test',
-            rating: 5,
+            rating: 4,
             text: 'test text'
         });
 
