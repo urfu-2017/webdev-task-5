@@ -20,10 +20,10 @@ const Queries = require('./queries');
         // const result = await queries.getAllSouvenirs();
         // const result = await queries.searchSouvenirs('Река чайник мандарин кофе');
         // const result = await queries.getSouvenirsByTag('чай');
-        const result = await queries.addReview('5abe65514d0c9d02c12eaf91', {
-            login: 'kekmachine', text: 'ololosha', rating: 1
-        });
-        // const result = await queries.getCartSum('justice');
+        // const result = await queries.addReview('5abe65514d0c9d02c12eaf91', {
+        //     login: 'kekmachine', text: 'ololosha', rating: 1
+        // });
+        const result = await queries.getCartSum('justice');
         console.info(result);
     } catch (error) {
         console.error(error);

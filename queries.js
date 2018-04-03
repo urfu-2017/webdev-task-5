@@ -29,7 +29,7 @@ module.exports = class Queries {
         souvenirSchema.index({ country: 1, rating: 1, price: 1 });
 
         const cartSchema = schema({
-            login: { type: String, index: { unique: true } },
+            login: { type: String, unique: true },
             items: [{
                 souvenirId: ObjectId,
                 amount: PositiveNumber
