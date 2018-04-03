@@ -138,28 +138,24 @@ module.exports = class Queries {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        const result = await this._Cart.aggregate([
-            { $match: { login } },
-            { $unwind: '$items' },
-            {
-                $lookup: {
-                    from: this._Souvenir.collection.name,
-                    localField: 'items.souvenirId',
-                    foreignField: '_id',
-                    as: 'souvenirs'
+        const result = await this._Cart
+            .aggregate()
+            .match({ login })
+            .unwind('items')
+            .lookup({
+                from: this._Souvenir.collection.name,
+                localField: 'items.souvenirId',
+                foreignField: '_id',
+                as: 'souvenirs'
+            })
+            .unwind('souvenirs')
+            .group({
+                _id: null,
+                totalPrice: {
+                    $sum: { $multiply: ['$items.amount', '$souvenirs.price'] }
                 }
-            },
-            { $unwind: '$souvenirs' },
-            {
-                $group: {
-                    _id: null,
-                    totalPrice: {
-                        $sum: { $multiply: ['$items.amount', '$souvenirs.price'] }
-                    }
-                }
-            }
-        ]);
+            });
 
-        return result[0].totalPrice;
+        return result.length ? result[0].totalPrice : 0;
     }
 };
