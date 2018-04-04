@@ -18,7 +18,7 @@ const Queries = require('./queries');
         // const allSouvenirs = await queries.getAllSouvenirs();
         // console.info('allSouvenirs', allSouvenirs);
 
-        // если 1000 все прав, если 0 то []. Если ничего не передать, то выходит ошибка        
+        // если 1000 все прав, если 0 то []. Если ничего не передать, то выходит ошибка
         // const cheapSouvenirs = await queries.getCheapSouvenirs(1000);
         // console.info('cheapSouvenirs', cheapSouvenirs);
 
@@ -59,7 +59,9 @@ const Queries = require('./queries');
         // const deleteOutOfStockSouvenirs = await queries.deleteOutOfStockSouvenirs();
         // console.info('deleteOutOfStockSouvenirs', deleteOutOfStockSouvenirs);
 
-        const addReview = await queries.addReview('5abe65514d0c9d02c12eaf55', { login: 'traveler', rating: 5, text: 'Просто класс!' });
+        const addReview = await queries.addReview('5abe65514d0c9d02c12eaf55', {
+            login: 'traveler', rating: 5, text: 'Просто класс!'
+        });
         console.info('addReview', addReview);
 
         // работает
