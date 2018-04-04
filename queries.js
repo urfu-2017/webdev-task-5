@@ -10,15 +10,15 @@ module.exports = class Queries {
                 login: String,
                 date: Date,
                 text: String,
-                rating: { type: Number, default: 0, min: 0, max: 5 },
+                rating: { type: Number, default: 0, min: 0 },
                 isApproved: { type: Boolean, default: true }
             })],
             name: String,
             image: String,
             price: { type: Number, index: true },
-            amount: { type: Number, index: true },
+            amount: { type: Number, index: true, min: 0 },
             country: String,
-            rating: { type: Number, default: 0, min: 0, max: 5 },
+            rating: { type: Number, default: 0, min: 0 },
             isRecent: { type: Boolean, default: 0 },
             __v: { type: Number, default: 0 }
         });
