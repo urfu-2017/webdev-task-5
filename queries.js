@@ -85,20 +85,19 @@ module.exports = class Queries {
                     ratingSum += review.rating;
                 })
             );
-        this._Souvenir.update({ _id: souvenirId }, {
-            $push: {
-                reviews: {
-                    login,
-                    rating,
-                    text,
-                    date: new Date(),
-                    isApproved: false
-                }
-            },
-            $set: {
-                rating: ratingSum / reviewsCount
-            }
+
+        let review = {
+            login,
+            rating,
+            text,
+            date: new Date(),
+            isApproved: false
+        };
+        await this._Souvenir.findOneAndUpdate({ _id: souvenirId }, {
+            $push: { reviews: review },
+            $set: { rating: ratingSum / reviewsCount }
         });
+        // await
     }
 
     async getCartSum(login) {
