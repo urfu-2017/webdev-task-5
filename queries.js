@@ -72,9 +72,9 @@ module.exports = class Queries {
     async addReview(souvenirId, { login, rating, text }) {
         return this._Souvenir.findById(souvenirId)
             .then(souvenir => {
-                souvenir.rating = (souvenir.rating * souvenir.reviews.length + rating) /
-                    (souvenir.reviews.length + 1);
+                const ratingSum = Math.round(souvenir.rating * souvenir.reviews.length);
                 souvenir.reviews.push({ login, rating, text });
+                souvenir.rating = (ratingSum + rating) / souvenir.reviews.length;
 
                 return souvenir.save();
             });
