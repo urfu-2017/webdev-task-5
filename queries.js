@@ -6,12 +6,12 @@ module.exports = class Queries {
             // Ваша схема сувенира тут
             tags: [String],
             reviews: [mongoose.Schema({ // eslint-disable-line new-cap
-                _id: mongoose.Schema.ObjectId,
+                _id: mongoose.Schema.Types.ObjectId,
                 login: String,
                 date: Date,
                 text: String,
                 rating: { type: Number, default: 0, min: 0 },
-                isApproved: { type: Boolean, default: true }
+                isApproved: Boolean
             })],
             name: String,
             image: String,
