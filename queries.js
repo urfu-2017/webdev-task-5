@@ -1,20 +1,11 @@
 'use strict';
 
-const uuid4 = require('uuid/v4');
-
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = new mongoose.Schema({
             tags: [String],
-            reviews: [{
-                id: { type: String, default: uuid4 },
-                login: String,
-                date: { type: Date, default: Date.now },
-                text: String,
-                rating: Number,
-                isApproved: { type: Boolean, default: false }
-            }],
-            name: { type: String, unique: true },
+            reviews: [mongoose.Schema.Types.Mixed],
+            name: String,
             image: String,
             price: { type: Number, index: true },
             amount: Number,
@@ -50,7 +41,7 @@ module.exports = class Queries {
     }
 
     getSouvenirsByTag(tag) {
-        return this._Souvenir.find({ tags: tag }, 'name image price -_id');
+        return this._Souvenir.find({ tags: tag }, { name: 1, image: 1, price: 1, _id: 0 });
     }
 
     getSouvenrisCount({ country, rating, price }) {
@@ -72,8 +63,11 @@ module.exports = class Queries {
     async addReview(souvenirId, { login, rating, text }) {
         return this._Souvenir.findById(souvenirId)
             .then(souvenir => {
+                if (!souvenir) {
+                    return;
+                }
                 const ratingSum = Math.round(souvenir.rating * souvenir.reviews.length);
-                souvenir.reviews.push({ login, rating, text });
+                souvenir.reviews.push({ login, rating, text, date: new Date(), isApproved: false });
                 souvenir.rating = (ratingSum + rating) / souvenir.reviews.length;
 
                 return souvenir.save();
@@ -84,6 +78,7 @@ module.exports = class Queries {
         return this._Cart.findOne({ login })
             .populate({ path: 'items.souvenirId', select: 'price', model: this._Souvenir })
             .then(cart => cart
-                ? cart.items.map(i => i.amount * i.souvenirId.price).reduce((i, j) => i + j) : 0);
+                ? cart.items.map(i => i.amount * i.souvenirId.price).reduce((i, j) => i + j, 0)
+                : 0);
     }
 };
