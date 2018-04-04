@@ -4,10 +4,32 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема сувенира тут
+            tags: [String],
+            reviews: [mongoose.Schema({ // eslint-disable-line new-cap
+                login: String,
+                date: { type: Date, default: Date.now },
+                text: String,
+                rating: { type: Number, default: 0, min: 0, max: 5 },
+                isApproved: { type: Boolean, default: true }
+            })],
+            name: String,
+            image: String,
+            price: { type: Number, default: 0 },
+            amount: { type: Number, default: 0 },
+            country: String,
+            rating: { type: Number, default: 0, min: 0, max: 5 },
+            isRecent: { type: Boolean, default: 0 },
+            __v: { type: Number, default: 0 }
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема корзины тут
+            items: [mongoose.Schema({ // eslint-disable-line new-cap
+                souvenirId: mongoose.Schema.Types.ObjectId,
+                amount: { type: Number, default: 1, min: 1 }
+            })],
+            login: String,
+            __v: { type: Number, default: 0 }
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
@@ -19,19 +41,27 @@ module.exports = class Queries {
 
     getAllSouvenirs() {
         // Данный метод должен возвращать все сувениры
+        return this._Souvenir.find();
     }
 
     getCheapSouvenirs(price) {
         // Данный метод должен возвращать все сувениры, цена которых меньше или равна price
+        return this._Souvenir.find({ price: { $lte: price } });
     }
 
     getTopRatingSouvenirs(n) {
         // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
+        return this._Souvenir
+            .find()
+            .sort({ rating: -1 })
+            .limit(n);
     }
 
     getSouvenirsByTag(tag) {
         // Данный метод должен возвращать все сувениры, в тегах которых есть tag
         // Кроме того, в ответе должны быть только поля name, image и price
+        return this._Souvenir
+            .find({ tags: tag }, { _id: 0, name: 1, image: 1, price: 1, tags: 1 });
     }
 
     getSouvenrisCount({ country, rating, price }) {
@@ -41,16 +71,22 @@ module.exports = class Queries {
 
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
+        return this._Souvenir
+            .count({ country: country, rating: { $gte: rating }, price: { $lte: price } });
     }
 
     searchSouvenirs(substring) {
         // Данный метод должен возвращать все сувениры, в название которых входит
         // подстрока substring. Поиск должен быть регистронезависимым
+        return this._Souvenir
+            .find({ name: { $regex: substring } });
     }
 
     getDisscusedSouvenirs(date) {
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
+        return this._Souvenir
+            .find({ 'reviews.0.date': { $gte: date } });
     }
 
     deleteOutOfStockSouvenirs() {
@@ -59,6 +95,8 @@ module.exports = class Queries {
 
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
+        return this._Souvenir
+            .remove({ amount: 0 });
     }
 
     async addReview(souvenirId, { login, rating, text }) {
@@ -67,11 +105,42 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
+        const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
+        souvenir.rating = (souvenir.rating + rating) / (souvenir.reviews.length + 1);
+        souvenir.reviews.push({
+            login: login,
+            date: Date.now(),
+            text: text,
+            rating: rating,
+            isApproved: false
+        });
+
+        return souvenir.save();
     }
 
     async getCartSum(login) {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
+        const cart = await this._Cart.findOne({ login: login }, { _id: 0, items: 1 });
+        const souvenirIdInCart = cart.items.map((item) => {
+            return item.souvenirId;
+        });
+
+        const souvenirs = await this._Souvenir.find({
+            _id: { $in: souvenirIdInCart }
+        }, { price: 1 });
+
+        return souvenirs.reduce((sum, souvenir) => {
+            cart.items.forEach((souvenirInCart) => {
+                if (String(souvenirInCart.souvenirId) === String(souvenir._id)) {
+                    sum += souvenir.price * souvenirInCart.amount;
+
+                    return sum;
+                }
+            });
+
+            return sum;
+        }, 0);
     }
 };
