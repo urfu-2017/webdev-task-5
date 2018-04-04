@@ -16,10 +16,10 @@ module.exports = class Queries {
             })],
             name: String,
             image: String,
-            price: Number,
+            price: { type: Number, index: true },
             amount: Number,
-            country: String,
-            rating: Number,
+            country: { type: String, index: true },
+            rating: { type: Number, index: true },
             isRecent: Boolean
         });
 
