@@ -62,7 +62,7 @@ module.exports = class Queries {
         // Данный метод должен возвращать все сувениры, в тегах которых есть tag
         // Кроме того, в ответе должны быть только поля name, image и price
         return this._Souvenir
-            .find({ tags: tag }, { _id: 0, name: 1, image: 1, price: 1, tags: 1 });
+            .find({ tags: tag }, { _id: 0, name: 1, image: 1, price: 1 });
     }
 
     getSouvenrisCount({ country, rating, price }) {
