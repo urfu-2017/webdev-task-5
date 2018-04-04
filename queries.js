@@ -8,7 +8,7 @@ module.exports = class Queries {
             reviews: [mongoose.Schema({ // eslint-disable-line new-cap
                 _id: mongoose.Schema.ObjectId,
                 login: String,
-                date: { type: Date, default: Date.now },
+                date: Date,
                 text: String,
                 rating: { type: Number, default: 0, min: 0, max: 5 },
                 isApproved: { type: Boolean, default: true }
@@ -29,7 +29,7 @@ module.exports = class Queries {
                 souvenirId: mongoose.Schema.Types.ObjectId,
                 amount: { type: Number, default: 1, min: 1 }
             })],
-            login: String,
+            login: { type: String, unique: true },
             __v: { type: Number, default: 0 }
         });
 
@@ -111,7 +111,7 @@ module.exports = class Queries {
             (souvenir.reviews.length + 1);
         souvenir.reviews.push({
             login: login,
-            date: Date.now(),
+            date: new Date(),
             text: text,
             rating: rating,
             isApproved: false
