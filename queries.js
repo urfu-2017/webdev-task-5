@@ -126,9 +126,11 @@ module.exports = class Queries {
     * в схеме
     */
     async getCartSum(login) {
-        const ids = (await this._Cart.findOne({ login })).items.map(x => x.souvenirId);
+        const basket = (await this._Cart.findOne({ login })).items.reduce((result, current) =>
+            Object.assign(result, { [current.souvenirId]: current.amount }),
+        {});
 
-        return (await this._Souvenir.find({ _id: { $in: ids } }, { price: 1 }))
-            .map(x => x.price).reduce((a, b) => a + b, 0);
+        return (await this._Souvenir.find({ _id: { $in: Object.keys(basket) } }, { price: 1 }))
+            .map(x => x.price * basket[x._id]).reduce((a, b) => a + b, 0);
     }
 };
