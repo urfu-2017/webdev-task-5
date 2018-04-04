@@ -6,6 +6,7 @@ module.exports = class Queries {
             // Ваша схема сувенира тут
             tags: [String],
             reviews: [mongoose.Schema({ // eslint-disable-line new-cap
+                _id: mongoose.Schema.ObjectId,
                 login: String,
                 date: { type: Date, default: Date.now },
                 text: String,
@@ -14,8 +15,8 @@ module.exports = class Queries {
             })],
             name: String,
             image: String,
-            price: { type: Number, default: 0 },
-            amount: { type: Number, default: 0 },
+            price: { type: Number, index: true },
+            amount: { type: Number, index: true },
             country: String,
             rating: { type: Number, default: 0, min: 0, max: 5 },
             isRecent: { type: Boolean, default: 0 },
@@ -106,7 +107,8 @@ module.exports = class Queries {
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
         const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
-        souvenir.rating = (souvenir.rating + rating) / (souvenir.reviews.length + 1);
+        souvenir.rating = (souvenir.rating * souvenir.reviews.length + rating) /
+            (souvenir.reviews.length + 1);
         souvenir.reviews.push({
             login: login,
             date: Date.now(),
@@ -115,7 +117,7 @@ module.exports = class Queries {
             isApproved: false
         });
 
-        return souvenir.save();
+        return await souvenir.save();
     }
 
     async getCartSum(login) {

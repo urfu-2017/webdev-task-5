@@ -65,8 +65,8 @@ const Queries = require('./queries');
         console.info('addReview', addReview);
 
         // работает
-        const сartSum = await queries.getCartSum('steve');
-        console.info('сartSum', сartSum);
+        // const сartSum = await queries.getCartSum('steve');
+        // console.info('сartSum', сartSum);
 
     } catch (error) {
         console.error(error);
