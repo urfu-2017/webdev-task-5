@@ -25,6 +25,7 @@ module.exports = class Queries {
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема корзины тут
+            _id: mongoose.Schema.Types.ObjectId,
             items: [mongoose.Schema({ // eslint-disable-line new-cap
                 souvenirId: mongoose.Schema.Types.ObjectId,
                 amount: { type: Number, default: 1, min: 1 }
