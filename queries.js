@@ -23,7 +23,7 @@ module.exports = class Queries {
                 set: v => Math.round(v),
                 required: true
             },
-            country: { type: String,  index: true },
+            country: { type: String, index: true },
             rating: { type: Number, required: true, index: true },
             isRecent: Boolean
         });
