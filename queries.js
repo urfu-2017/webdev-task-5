@@ -3,6 +3,7 @@
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewShema = mongoose.Schema({ // eslint-disable-line new-cap
+            _id: mongoose.Schema.Types.ObjectId,
             login: String,
             date: Date,
             text: String,
@@ -69,7 +70,7 @@ module.exports = class Queries {
     }
 
     searchSouvenirs(substring) {
-        return this._Souvenir.find({ $regex: new RegExp(substring, 'i') });
+        return this._Souvenir.find({ name: { $regex: new RegExp(substring, 'i') } });
     }
 
     getDisscusedSouvenirs(date) {
