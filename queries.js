@@ -110,7 +110,7 @@ module.exports = class Queries {
         });
         souvenir.rating = souvenir.reviews
             .map(review => review.rating)
-            .reduce((total, rating) => total + rating, 0) / souvenir.reviews.length;
+            .reduce((total, currentRating) => total + currentRating, 0) / souvenir.reviews.length;
 
         await souvenir.save();
         // Данный метод должен добавлять отзыв к сувениру souvenirId, отзыв добавляется
