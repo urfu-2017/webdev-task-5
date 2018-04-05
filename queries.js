@@ -130,7 +130,7 @@ module.exports = class Queries {
                     isApproved: false
                 });
 
-                return souvenir.save();
+                souvenir.save();
             });
     }
 
