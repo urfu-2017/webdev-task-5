@@ -46,66 +46,65 @@ module.exports = class Queries {
 
     // Далее идут методы, которые вам необходимо реализовать:
 
-    // getAllSouvenirs() {
-    //     // Данный метод должен возвращать все сувениры
-    //     return this._Souvenir.find({});
-    // }
-    //
-    // getCheapSouvenirs(price) {
-    //     // Данный метод должен возвращать все сувениры, цена которых меньше или равна price
-    //     return this._Souvenir.where('price').lte(price);
-    // }
-    //
-    // getTopRatingSouvenirs(n) {
-    //     // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
-    //     return this._Souvenir.find({}).sort('-rating').limit(n);
-    // }
-    //
-    // getSouvenirsByTag(tag) {
-    //     // Данный метод должен возвращать все сувениры, в тегах которых есть tag
-    //     // Кроме того, в ответе должны быть только поля name, image и price
-    //
-    //     return this._Souvenir.find({ tags: tag })
-    // .select({ name: 1, image: 1, price: 1, _id: 0 });
-    // }
-    //
-    // getSouvenrisCount({ country, rating, price }) {
-    //     // Данный метод должен возвращать количество сувениров,
-    //     // из страны country, с рейтингом больше или равной rating,
-    //     // и ценой меньше или равной price
-    //
-    //     // ! Важно, чтобы метод работал очень быстро,
-    //     // поэтому учтите это при определении схем
-    //
-    //     return this._Souvenir.where('country', country)
-    //         .where('rating').gte(rating)
-    //         .where('price').lte(price)
-    //         .count();
-    // }
-
-    searchSouvenirs(substring) {
-        // Данный метод должен возвращать все сувениры, в название которых входит
-        // подстрока substring. Поиск должен быть регистронезависимым
-
-        return this._Souvenir.where({ 'name': { $regex: new RegExp(substring, 'i') } });
+    getAllSouvenirs() {
+        // Данный метод должен возвращать все сувениры
+        return this._Souvenir.find({});
     }
 
-    getDisscusedSouvenirs(date) {
-        // Данный метод должен возвращать все сувениры,
-        // первый отзыв на которые был оставлен не раньше даты date
-
-        return this._Souvenir.where('reviews.0.date').gt(date);
+    getCheapSouvenirs(price) {
+        // Данный метод должен возвращать все сувениры, цена которых меньше или равна price
+        return this._Souvenir.where('price').lte(price);
     }
 
-    deleteOutOfStockSouvenirs() {
-        // Данный метод должен удалять все сувениры, которых нет в наличии
-        // (то есть amount = 0)
-
-        // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
-        // в случае успешного удаления
-
-        return this._Souvenir.remove({ amount: 0 });
+    getTopRatingSouvenirs(n) {
+        // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
+        return this._Souvenir.find({}).sort('-rating').limit(n);
     }
+
+    getSouvenirsByTag(tag) {
+        // Данный метод должен возвращать все сувениры, в тегах которых есть tag
+        // Кроме того, в ответе должны быть только поля name, image и price
+
+        return this._Souvenir.find({ tags: tag }).select({ name: 1, image: 1, price: 1, _id: 0 });
+    }
+
+    getSouvenrisCount({ country, rating, price }) {
+        // Данный метод должен возвращать количество сувениров,
+        // из страны country, с рейтингом больше или равной rating,
+        // и ценой меньше или равной price
+
+        // ! Важно, чтобы метод работал очень быстро,
+        // поэтому учтите это при определении схем
+
+        return this._Souvenir.where('country', country)
+            .where('rating').gte(rating)
+            .where('price').lte(price)
+            .count();
+    }
+
+    // searchSouvenirs(substring) {
+    //     // Данный метод должен возвращать все сувениры, в название которых входит
+    //     // подстрока substring. Поиск должен быть регистронезависимым
+    //
+    //     return this._Souvenir.where({ 'name': { $regex: new RegExp(substring, 'i') } });
+    // }
+    //
+    // getDisscusedSouvenirs(date) {
+    //     // Данный метод должен возвращать все сувениры,
+    //     // первый отзыв на которые был оставлен не раньше даты date
+    //
+    //     return this._Souvenir.where('reviews.0.date').gt(date);
+    // }
+    //
+    // deleteOutOfStockSouvenirs() {
+    //     // Данный метод должен удалять все сувениры, которых нет в наличии
+    //     // (то есть amount = 0)
+    //
+    //     // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
+    //     // в случае успешного удаления
+    //
+    //     return this._Souvenir.remove({ amount: 0 });
+    // }
 
     async addReview(souvenirId, { login, rating, text }) {
         // Данный метод должен добавлять отзыв к сувениру souvenirId, отзыв добавляется
