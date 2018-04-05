@@ -20,8 +20,7 @@ module.exports = class Queries {
             amount: { type: Number, index: true, min: 0 },
             country: String,
             rating: { type: Number, min: 0 },
-            isRecent: { type: Boolean },
-            __v: { type: Number }
+            isRecent: { type: Boolean }
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
@@ -31,8 +30,7 @@ module.exports = class Queries {
                 souvenirId: mongoose.Schema.Types.ObjectId,
                 amount: { type: Number, min: 0 }
             })],
-            login: { type: String, unique: true },
-            __v: { type: Number }
+            login: { type: String, unique: true }
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
