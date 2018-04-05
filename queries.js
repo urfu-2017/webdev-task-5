@@ -1,7 +1,7 @@
 /* eslint-disable newline-per-chained-call */
 'use strict';
 
-const uuid = require('uuid/v4');
+// const uuid = require('uuid/v4');
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
