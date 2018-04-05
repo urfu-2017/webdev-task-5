@@ -93,7 +93,7 @@ module.exports = class Queries {
         const { items } = await this._Cart.findOne({ login: login }, { items: 1, _id: 0 });
         for (let i = 0; i < items.length; i++) {
             cartSum += (await this._Souvenir.findById(
-                items[i].souvenirId, { price: 1, _id: 0 })).price;
+                items[i].souvenirId, { price: 1, _id: 0 })).price * items[i].amount;
         }
 
         return cartSum;
