@@ -126,18 +126,18 @@ module.exports = class Queries {
             isApproved: false
         };
         souvenir.reviews.push(review);
-        souvenir.rating = Math.round(this.getNewRating(souvenir.reviews), 1);
+        souvenir.rating = Math.round(this.getNewRating(souvenir), 1);
 
-        souvenir.save();
+        return souvenir.save();
     }
 
-    getNewRating(reviews) {
+    getNewRating(souvenir) {
         let sum = 0;
-        for (let review of reviews) {
+        for (let review of souvenir.reviews) {
             sum += review.rating;
         }
 
-        return sum / reviews.length;
+        return sum / souvenir.reviews.length;
     }
 
     async getCartSum(login) {
