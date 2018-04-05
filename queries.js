@@ -92,17 +92,14 @@ module.exports = class Queries {
     }
 
     async getCartSum(login) {
-        // const basket = await this._Cart.findOne({ login });
-        // const souvenirIds = basket.items.map(item => item.souvenirId);
-        // const souvenir = await this._Souvenir.find({ _id: { $in: souvenirIds } });
-        // let cost = 0;
-        // for (let i = 0; i < basket.items.length; i++) {
-        //     const price = souvenir[i].price;
-        //     const amount = basket.items[i].amount;
-        //     cost += price * amount;
-        // }
-        console.info(login);
+        const basket = await this._Cart.findOne({ login });
+        let cost = 0;
+        for (var item of basket.items) {
+            const souvenir = await this._Souvenir.findById(item.souvenirId);
+            cost += souvenir.price * item.amount;
 
-        return 0;
+        }
+
+        return cost;
     }
 };
