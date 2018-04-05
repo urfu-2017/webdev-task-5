@@ -46,41 +46,42 @@ module.exports = class Queries {
 
     // Далее идут методы, которые вам необходимо реализовать:
 
-    getAllSouvenirs() {
-        // Данный метод должен возвращать все сувениры
-        return this._Souvenir.find({});
-    }
-
-    getCheapSouvenirs(price) {
-        // Данный метод должен возвращать все сувениры, цена которых меньше или равна price
-        return this._Souvenir.where('price').lte(price);
-    }
-
-    getTopRatingSouvenirs(n) {
-        // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
-        return this._Souvenir.find({}).sort('-rating').limit(n);
-    }
-
-    getSouvenirsByTag(tag) {
-        // Данный метод должен возвращать все сувениры, в тегах которых есть tag
-        // Кроме того, в ответе должны быть только поля name, image и price
-
-        return this._Souvenir.find({ tags: tag }).select({ name: 1, image: 1, price: 1, _id: 0 });
-    }
-
-    getSouvenrisCount({ country, rating, price }) {
-        // Данный метод должен возвращать количество сувениров,
-        // из страны country, с рейтингом больше или равной rating,
-        // и ценой меньше или равной price
-
-        // ! Важно, чтобы метод работал очень быстро,
-        // поэтому учтите это при определении схем
-
-        return this._Souvenir.where('country', country)
-            .where('rating').gte(rating)
-            .where('price').lte(price)
-            .count();
-    }
+    // getAllSouvenirs() {
+    //     // Данный метод должен возвращать все сувениры
+    //     return this._Souvenir.find({});
+    // }
+    //
+    // getCheapSouvenirs(price) {
+    //     // Данный метод должен возвращать все сувениры, цена которых меньше или равна price
+    //     return this._Souvenir.where('price').lte(price);
+    // }
+    //
+    // getTopRatingSouvenirs(n) {
+    //     // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
+    //     return this._Souvenir.find({}).sort('-rating').limit(n);
+    // }
+    //
+    // getSouvenirsByTag(tag) {
+    //     // Данный метод должен возвращать все сувениры, в тегах которых есть tag
+    //     // Кроме того, в ответе должны быть только поля name, image и price
+    //
+    //     return this._Souvenir.find({ tags: tag })
+    // .select({ name: 1, image: 1, price: 1, _id: 0 });
+    // }
+    //
+    // getSouvenrisCount({ country, rating, price }) {
+    //     // Данный метод должен возвращать количество сувениров,
+    //     // из страны country, с рейтингом больше или равной rating,
+    //     // и ценой меньше или равной price
+    //
+    //     // ! Важно, чтобы метод работал очень быстро,
+    //     // поэтому учтите это при определении схем
+    //
+    //     return this._Souvenir.where('country', country)
+    //         .where('rating').gte(rating)
+    //         .where('price').lte(price)
+    //         .count();
+    // }
 
     searchSouvenirs(substring) {
         // Данный метод должен возвращать все сувениры, в название которых входит
