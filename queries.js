@@ -93,7 +93,7 @@ module.exports = class Queries {
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
 
-        return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
+        return this._Souvenir.find({ 'reviews.0.date': { $gte: new Date(date) } });
     }
 
     deleteOutOfStockSouvenirs() {
@@ -122,17 +122,19 @@ module.exports = class Queries {
         };
 
         let noteRating = rating;
-        const note = await this._Souvenir.findOne({ _id: souvenirId });
+        const note = await this._Souvenir.findOne({ _id: souvenirId }, { rating: 1, reviews: 1 });
         for (const el of note.reviews) {
             noteRating += el.rating;
         }
 
         noteRating = noteRating / (note.reviews.length + 1);
 
-        return this._Souvenir.update(
+        await this._Souvenir.update(
             { _id: souvenirId },
             { $push: { reviews: comment }, $set: { rating: noteRating } }
         );
+
+        return true;
     }
 
     async getCartSum(login) {
