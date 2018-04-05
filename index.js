@@ -13,7 +13,7 @@ const Queries = require('./queries');
 
     try {
         // Здесь можно делать запросы, чтобы проверять, что они правильно работают
-        const result = await queries.getCartSum('superma');
+        const result = await queries.getCartSum('superman');
 
         console.info(result);
     } catch (error) {

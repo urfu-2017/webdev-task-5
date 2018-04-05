@@ -64,7 +64,7 @@ module.exports = class Queries {
         // Кроме того, в ответе должны быть только поля name, image и price
 
         return this._Souvenir.find(
-            { tags: tag },
+            { tags: { $in: [tag] } },
             { _id: 0, name: 1, image: 1, price: 1 });
     }
 
@@ -94,7 +94,7 @@ module.exports = class Queries {
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
 
-        return this._Souvenir.find({ 'reviews.0.date': { $gte: new Date(date) } });
+        return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
     }
 
     deleteOutOfStockSouvenirs() {
@@ -118,7 +118,7 @@ module.exports = class Queries {
 
         const noteRating = (note.rating * note.reviews.length + rating) / (note.reviews.length + 1);
 
-        await this._Souvenir.update(
+        return await this._Souvenir.update(
             { _id: souvenirId },
             {
                 $set: { rating: noteRating },
@@ -131,8 +131,6 @@ module.exports = class Queries {
                 } }
             }
         );
-
-        return true;
     }
 
     async getCartSum(login) {
@@ -146,7 +144,9 @@ module.exports = class Queries {
             const note = await this._Souvenir.findOne(
                 { _id: user.items[i].souvenirId },
                 { price: 1 });
-            fullPrice += note.price * user.items[i].amount;
+            if (note) {
+                fullPrice += note.price * user.items[i].amount;
+            }
         }
 
         return fullPrice;
