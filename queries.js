@@ -15,10 +15,11 @@ module.exports = class Queries {
         const souvenirSchema = mongoose.Schema({
             _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
-            reviews: [mongoose.Schema.Types.Mixed],
+            reviews: [reviewSchema],
             name: String,
+            image: String,
             price: { type: Number, index: true },
-            amout: Number,
+            amount: Number,
             country: { type: String, index: true },
             rating: { type: Number, index: true },
             isRecent: Boolean,
