@@ -7,17 +7,18 @@ module.exports = class Queries {
             _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
             reviews: [{
+                _id: mongoose.Schema.Types.ObjectId,
                 login: String,
                 rating: Number,
                 text: String,
-                date: { type: Date, default: Date.now },
+                date: Date,
                 isApproved: Boolean }],
             name: String,
             image: String,
-            price: { type: Number, index: true },
+            price: Number,
             amount: Number,
-            country: { type: String, index: true },
-            rating: { type: Number, index: true },
+            country: String,
+            rating: Number,
             isRecent: Boolean,
             __v: Number
         });
@@ -26,7 +27,10 @@ module.exports = class Queries {
             // Ваша схема корзины тут
             _id: mongoose.Schema.Types.ObjectId,
             items: [
-                { souvenirId: mongoose.Schema.Types.ObjectId, amount: Number }
+                {
+                    souvenirId: mongoose.Schema.Types.ObjectId,
+                    amount: Number
+                }
             ],
             login: { type: String, unique: true },
             __v: Number
