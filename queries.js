@@ -2,17 +2,17 @@
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
-        // const souvenirReviewSchema = new mongoose.Schema({
-        //     login: String,
-        //     date: Date,
-        //     text: String,
-        //     rating: Number,
-        //     isApproved: Boolean
-        // });
+        const souvenirReviewSchema = new mongoose.Schema({
+            login: String,
+            date: Date,
+            text: String,
+            rating: Number,
+            isApproved: Boolean
+        });
 
         const souvenirSchema = new mongoose.Schema({
             tags: [String],
-            reviews: [mongoose.Schema.Types.Mixed],
+            reviews: [souvenirReviewSchema],
             name: String,
             image: String,
             price: { type: Number, index: true },
@@ -102,9 +102,9 @@ module.exports = class Queries {
         const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
         souvenir.reviews.push({
             login,
-            rating,
-            text,
             date: new Date(),
+            text,
+            rating,
             isApproved: false
         });
         souvenir.rating = souvenir.reviews
