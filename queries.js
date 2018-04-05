@@ -65,7 +65,7 @@ module.exports = class Queries {
 
     getSouvenrisCount({ country, rating, price }) {
         return this._Souvenir
-            .find({ country, rating: { $gte: rating }, price: { $lte: price } });
+            .count({ country, rating: { $gte: rating }, price: { $lte: price } });
         // Данный метод должен возвращать количество сувениров,
         // из страны country, с рейтингом больше или равной rating,
         // и ценой меньше или равной price
@@ -121,14 +121,13 @@ module.exports = class Queries {
     }
 
     async getCartSum(login) {
-        return login;
-        // const cart = await this._Cart
-        //     .findOne({ login })
-        //     .populate('items.souvenirId');
+        const cart = await this._Cart
+            .findOne({ login })
+            .populate('items.souvenirId');
 
-        // return cart.items
-        //     .map(item => item.souvenirId ? item.souvenirId.price * item.amount : 0)
-        //     .reduce((total, price) => total + price, 0);
+        return cart.items
+            .map(item => item.souvenirId ? item.souvenirId.price * item.amount : 0)
+            .reduce((total, price) => total + price, 0);
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
