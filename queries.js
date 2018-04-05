@@ -1,7 +1,7 @@
 /* eslint-disable newline-per-chained-call */
 'use strict';
 
-// const uuid = require('uuid/v4');
+const uuid = require('uuid/v4');
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
@@ -106,33 +106,31 @@ module.exports = class Queries {
         return this._Souvenir.remove({ amount: 0 });
     }
 
-    // async addReview(souvenirId, { login, rating, text }) {
-    //     // Данный метод должен добавлять отзыв к сувениру souvenirId, отзыв добавляется
-    //     // в конец массива (чтобы сохранить упорядоченность по дате),
-    //     // содержит login, rating, text - из аргументов,
-    //     // date - текущая дата и isApproved - false
-    //     // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-    //
-    //     return this._Souvenir.findById(souvenirId)
-    //         .then((souvenir) => {
-    //             let sum = rating;
-    //             souvenir.reviews.forEach((review) => {
-    //                 sum += review.rating;
-    //             });
-    //
-    //             souvenir.rating = sum / (souvenir.reviews.length + 1);
-    //             souvenir.reviews.push({
-    //                 id: uuid(),
-    //                 login,
-    //                 date: Date.now(),
-    //                 text,
-    //                 rating,
-    //                 isApproved: false
-    //             });
-    //
-    //             souvenir.save();
-    //         });
-    // }
+    async addReview(souvenirId, { login, rating, text }) {
+        // Данный метод должен добавлять отзыв к сувениру souvenirId, отзыв добавляется
+        // в конец массива (чтобы сохранить упорядоченность по дате),
+        // содержит login, rating, text - из аргументов,
+        // date - текущая дата и isApproved - false
+        // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
+        const souvenir = await this._Souvenir.findById(souvenirId);
+
+        let sum = rating;
+        souvenir.reviews.forEach((review) => {
+            sum += review.rating;
+        });
+
+        souvenir.rating = sum / (souvenir.reviews.length + 1);
+        souvenir.reviews.push({
+            id: uuid(),
+            login,
+            date: Date.now(),
+            text,
+            rating,
+            isApproved: false
+        });
+
+        return souvenir.save();
+    }
 
     async getCartSum(login) {
         // Данный метод должен считать общую стоимость корзины пользователя login
