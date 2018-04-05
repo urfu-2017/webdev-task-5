@@ -113,13 +113,9 @@ module.exports = class Queries {
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
         const souvenir = await this._Souvenir.findById(souvenirId);
+        const reviewCount = souvenir.reviews.length;
 
-        let sum = rating;
-        souvenir.reviews.forEach((review) => {
-            sum += review.rating;
-        });
-
-        souvenir.rating = sum / (souvenir.reviews.length + 1);
+        souvenir.rating = (souvenir.rating * reviewCount + rating) / (reviewCount + 1);
         souvenir.reviews.push({
             id: uuid(),
             login,
