@@ -41,36 +41,36 @@ module.exports = class Queries {
 
     getAllSouvenirs() {
         return '';
-        return this._Souvenir.find();
+        // return this._Souvenir.find();
     }
 
     getCheapSouvenirs(price) {
-        return '';
+        return price;
         // Данный метод должен возвращать все сувениры, цена которых меньше или равна price
-        return this._Souvenir.find({ price: { $lte: price } });
+        // return this._Souvenir.find({ price: { $lte: price } });
     }
 
     getTopRatingSouvenirs(n) {
-        return '';
+        return n;
         // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
-        return this._Souvenir
-            .find()
-            .sort({ rating: -1 })
-            .limit(n);
+        // return this._Souvenir
+        //     .find()
+        //     .sort({ rating: -1 })
+        //     .limit(n);
     }
 
     getSouvenirsByTag(tag) {
-        return '';
-        return this._Souvenir
-            .find({ tags: tag }, { name: 1, image: 1, price: 1, _id: 0 });
+        return tag;
+        // return this._Souvenir
+        //     .find({ tags: tag }, { name: 1, image: 1, price: 1, _id: 0 });
         // Данный метод должен возвращать все сувениры, в тегах которых есть tag
         // Кроме того, в ответе должны быть только поля name, image и price
     }
 
     getSouvenrisCount({ country, rating, price }) {
-        return '';
-        return this._Souvenir
-            .find({ country, rating: { $gte: rating }, price: { $lte: price } });
+        return { country, rating, price };
+        // return this._Souvenir
+        //     .find({ country, rating: { $gte: rating }, price: { $lte: price } });
         // Данный метод должен возвращать количество сувениров,
         // из страны country, с рейтингом больше или равной rating,
         // и ценой меньше или равной price
@@ -80,17 +80,17 @@ module.exports = class Queries {
     }
 
     searchSouvenirs(substring) {
-        return '';
-        return this._Souvenir
-            .find({ name: { $regex: substring, $options: 'i' } });
+        return substring;
+        // return this._Souvenir
+        //     .find({ name: { $regex: substring, $options: 'i' } });
         // Данный метод должен возвращать все сувениры, в название которых входит
         // подстрока substring. Поиск должен быть регистронезависимым
     }
 
     getDisscusedSouvenirs(date) {
-        return '';
-        return this._Souvenir
-            .find({ 'reviews.0.date': { $gte: date } });
+        return date;
+        // return this._Souvenir
+        //     .find({ 'reviews.0.date': { $gte: date } });
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
     }
@@ -102,8 +102,8 @@ module.exports = class Queries {
 
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
-        return this._Souvenir
-            .remove({ amount: 0 });
+        // return this._Souvenir
+        //     .remove({ amount: 0 });
     }
 
     async addReview(souvenirId, { login, rating, text }) {
@@ -129,14 +129,14 @@ module.exports = class Queries {
     }
 
     async getCartSum(login) {
-        return '';
-        const cart = await this._Cart
-            .findOne({ login })
-            .populate('items.souvenirId');
+        return login;
+        // const cart = await this._Cart
+        //     .findOne({ login })
+        //     .populate('items.souvenirId');
 
-        return cart.items
-            .map(item => item.souvenirId ? item.souvenirId.price * item.amount : 0)
-            .reduce((total, price) => total + price, 0);
+        // return cart.items
+        //     .map(item => item.souvenirId ? item.souvenirId.price * item.amount : 0)
+        //     .reduce((total, price) => total + price, 0);
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
