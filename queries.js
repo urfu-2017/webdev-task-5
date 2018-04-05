@@ -28,7 +28,7 @@ module.exports = class Queries {
             items: [
                 { souvenirId: mongoose.Schema.Types.ObjectId, amount: Number }
             ],
-            login: String,
+            login: { type: String, unique: true },
             __v: Number
         });
 
@@ -93,7 +93,7 @@ module.exports = class Queries {
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
 
-        return this._Souvenir.find({ 'reviews.0.date': { $gte: new Date(date) } });
+        return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
     }
 
     deleteOutOfStockSouvenirs() {
