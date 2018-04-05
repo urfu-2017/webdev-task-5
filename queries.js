@@ -73,11 +73,13 @@ module.exports = class Queries {
         // из страны country, с рейтингом больше или равной rating,
         // и ценой меньше или равной price
 
-        return this._Souvenir.count({
-            country: country,
-            rating: { $gte: rating },
-            price: { $lte: price }
-        });
+        return this._Souvenir
+            .find({
+                country: country,
+                rating: { $gte: rating },
+                price: { $lte: price }
+            })
+            .count();
 
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
