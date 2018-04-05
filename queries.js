@@ -9,6 +9,7 @@ module.exports = class Queries {
             // Ваша схема сувенира тут
             tags: [String],
             reviews: [{
+                _id: mongoose.Schema.ObjectId,
                 login: String,
                 date: Date,
                 text: String,
