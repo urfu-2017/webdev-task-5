@@ -14,8 +14,8 @@ const Queries = require('./queries');
     try {
         // Здесь можно делать запросы, чтобы проверять, что они правильно работают
         // const result = await queries.getCartSum('justice');
-        // const result = await queries.searchSouvenirs('И');
-        // console.info(result);
+        const result = await queries.searchSouvenirs('И');
+        console.info(result);
     } catch (error) {
         console.error(error);
     }
