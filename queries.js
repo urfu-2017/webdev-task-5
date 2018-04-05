@@ -4,6 +4,7 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема сувенира тут
+            _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
             reviews: [mongoose.Schema({ // eslint-disable-line new-cap
                 _id: mongoose.Schema.Types.ObjectId,
@@ -126,22 +127,19 @@ module.exports = class Queries {
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
         const cart = await this._Cart.findOne({ login: login }, { _id: 0, items: 1 });
-        const souvenirIdInCart = cart.items.map((item) => {
-            return item.souvenirId;
+        const idAndAmont = {};
+        cart.items.forEach((item) => {
+            idAndAmont[item.souvenirId] = item.amount;
+
+            return idAndAmont;
         });
 
         const souvenirs = await this._Souvenir.find({
-            _id: { $in: souvenirIdInCart }
+            _id: { $in: Object.keys(idAndAmont) }
         }, { price: 1 });
 
         return souvenirs.reduce((sum, souvenir) => {
-            cart.items.forEach((souvenirInCart) => {
-                if (String(souvenirInCart.souvenirId) === String(souvenir._id)) {
-                    sum += souvenir.price * souvenirInCart.amount;
-
-                    return sum;
-                }
-            });
+            sum += souvenir.price * idAndAmont[souvenir._id];
 
             return sum;
         }, 0);
