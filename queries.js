@@ -3,18 +3,20 @@
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const review = mongoose.Schema({ // eslint-disable-line new-cap
+            _id: mongoose.Schema.Types.ObjectId,
             login: { type: String, required: true },
             date: { type: Date, required: true },
-            text: { type: String, required: true },
+            text: String,
             rating: { type: Number, required: true },
             isApproved: { type: Boolean, required: true }
         });
 
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
             reviews: [review],
             name: { type: String, required: true },
-            image: { type: String, required: true },
+            image: String,
             price: { type: Number, required: true, index: true },
             amount: { type: Number, required: true },
             country: { type: String, required: true, index: true },
@@ -29,6 +31,7 @@ module.exports = class Queries {
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            _id: mongoose.Schema.Types.ObjectId,
             items: [item],
             login: { type: String, required: true, unique: true },
             _v: { type: Number, required: true }
