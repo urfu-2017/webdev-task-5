@@ -5,7 +5,7 @@ module.exports = class Queries {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема сувенира тут
             _id: mongoose.Schema.Types.ObjectId,
-            tags: Array,
+            tags: [String],
             reviews: [{
                 login: String,
                 rating: Number,
@@ -14,10 +14,10 @@ module.exports = class Queries {
                 isApproved: Boolean }],
             name: String,
             image: String,
-            price: Number,
+            price: { type: Number, index: true },
             amount: Number,
-            country: String,
-            rating: Number,
+            country: { type: String, index: true },
+            rating: { type: Number, index: true },
             isRecent: Boolean,
             __v: Number
         });
@@ -73,13 +73,11 @@ module.exports = class Queries {
         // из страны country, с рейтингом больше или равной rating,
         // и ценой меньше или равной price
 
-        return this._Souvenir
-            .find({
-                country: country,
-                rating: { $gte: rating },
-                price: { $lte: price }
-            })
-            .count();
+        return this._Souvenir.count({
+            country: country,
+            rating: { $gte: rating },
+            price: { $lte: price }
+        });
 
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
