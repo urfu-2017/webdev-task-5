@@ -1,8 +1,6 @@
 /* eslint-disable newline-per-chained-call */
 'use strict';
 
-const uuid = require('uuid/v4');
-
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
 
@@ -11,8 +9,6 @@ module.exports = class Queries {
             // Ваша схема сувенира тут
             tags: [String],
             reviews: [{
-                _id: false,
-                id: String,
                 login: String,
                 date: Date,
                 text: String,
@@ -117,7 +113,6 @@ module.exports = class Queries {
 
         souvenir.rating = (souvenir.rating * reviewCount + rating) / (reviewCount + 1);
         souvenir.reviews.push({
-            id: uuid(),
             login,
             date: Date.now(),
             text,
