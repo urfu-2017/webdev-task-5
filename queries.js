@@ -65,7 +65,7 @@ module.exports = class Queries {
 
         return this._Souvenir.find(
             { tags: tag },
-            { name: 1, image: 1, price: 1 });
+            { _id: 0, name: 1, image: 1, price: 1 });
     }
 
     getSouvenrisCount({ country, rating, price }) {
@@ -113,13 +113,9 @@ module.exports = class Queries {
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
 
-        let noteRating = rating;
         const note = await this._Souvenir.findOne({ _id: souvenirId }, { rating: 1, reviews: 1 });
-        for (const el of note.reviews) {
-            noteRating += el.rating;
-        }
 
-        noteRating = noteRating / (note.reviews.length + 1);
+        const noteRating = (note.rating * note.reviews.length + rating) / (note.reviews.length + 1);
 
         await this._Souvenir.update(
             { _id: souvenirId },
