@@ -76,7 +76,8 @@ module.exports = class Queries {
         return this._Souvenir.count({
             country: country,
             rating: { $gte: rating },
-            price: { $lte: price } });
+            price: { $lte: price }
+        });
 
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
@@ -141,11 +142,11 @@ module.exports = class Queries {
 
         let fullPrice = 0;
         const user = await this._Cart.findOne({ login: login });
-        for (const el of user.items) {
-            const note = await this._Souvenir.findOne({ _id: el.souvenirId }, { price: 1 });
-            if (note !== null) {
-                fullPrice += note.price * el.amount;
-            }
+        for (let i = 0; i < user.items.length; i++) {
+            const note = await this._Souvenir.findOne(
+                { _id: user.items[i].souvenirId },
+                { price: 1 });
+            fullPrice += note.price * user.items[i].amount;
         }
 
         return fullPrice;
