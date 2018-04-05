@@ -131,7 +131,7 @@ module.exports = class Queries {
 
         return this._Souvenir.update(
             { _id: souvenirId },
-            { $push: { reviews: comment }, $set: { rating: noteRating } }
+            { $push: { reviews: comment } }
         );
     }
 
@@ -145,7 +145,7 @@ module.exports = class Queries {
         for (const el of user.items) {
             const note = await this._Souvenir.findOne({ _id: el.souvenirId }, { price: 1 });
             if (note !== null) {
-                fullPrice += note.price * el.amount;
+                fullPrice += 0;
             }
         }
 
