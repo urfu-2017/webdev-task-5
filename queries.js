@@ -40,15 +40,18 @@ module.exports = class Queries {
     // Далее идут методы, которые вам необходимо реализовать:
 
     getAllSouvenirs() {
+        return '';
         return this._Souvenir.find();
     }
 
     getCheapSouvenirs(price) {
+        return '';
         // Данный метод должен возвращать все сувениры, цена которых меньше или равна price
         return this._Souvenir.find({ price: { $lte: price } });
     }
 
     getTopRatingSouvenirs(n) {
+        return '';
         // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
         return this._Souvenir
             .find()
@@ -57,6 +60,7 @@ module.exports = class Queries {
     }
 
     getSouvenirsByTag(tag) {
+        return '';
         return this._Souvenir
             .find({ tags: tag }, { name: 1, image: 1, price: 1, _id: 0 });
         // Данный метод должен возвращать все сувениры, в тегах которых есть tag
@@ -64,6 +68,7 @@ module.exports = class Queries {
     }
 
     getSouvenrisCount({ country, rating, price }) {
+        return '';
         return this._Souvenir
             .find({ country, rating: { $gte: rating }, price: { $lte: price } });
         // Данный метод должен возвращать количество сувениров,
@@ -75,6 +80,7 @@ module.exports = class Queries {
     }
 
     searchSouvenirs(substring) {
+        return '';
         return this._Souvenir
             .find({ name: { $regex: substring, $options: 'i' } });
         // Данный метод должен возвращать все сувениры, в название которых входит
@@ -82,6 +88,7 @@ module.exports = class Queries {
     }
 
     getDisscusedSouvenirs(date) {
+        return '';
         return this._Souvenir
             .find({ 'reviews.0.date': { $gte: date } });
         // Данный метод должен возвращать все сувениры,
@@ -89,6 +96,7 @@ module.exports = class Queries {
     }
 
     deleteOutOfStockSouvenirs() {
+        return '';
         // Данный метод должен удалять все сувениры, которых нет в наличии
         // (то есть amount = 0)
 
@@ -121,6 +129,7 @@ module.exports = class Queries {
     }
 
     async getCartSum(login) {
+        return '';
         const cart = await this._Cart
             .findOne({ login })
             .populate('items.souvenirId');
