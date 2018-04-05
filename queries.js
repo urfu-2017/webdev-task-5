@@ -15,7 +15,7 @@ module.exports = class Queries {
         const souvenirSchema = mongoose.Schema({
             _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
-            reviews: [reviewSchema],
+            reviews: [mongoose.Schema.Types.Mixed],
             name: String,
             price: { type: Number, index: true },
             amout: Number,
@@ -83,7 +83,7 @@ module.exports = class Queries {
             (souvenir.rating * souvenir.reviews.length + rating) / (souvenir.reviews.length + 1);
         souvenir.reviews.push({ login, rating, text, date: Date.now(), isApproved: false });
 
-        return souvenir.save();
+        return await souvenir.save();
 
     }
 
