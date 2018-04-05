@@ -99,8 +99,7 @@ module.exports = class Queries {
     }
 
     async addReview(souvenirId, { login, rating, text }) {
-        let souvenir = await this._Souvenir.find({ _id: souvenirId });
-        souvenir = souvenir[0];
+        const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
         souvenir.reviews.push({
             login,
             rating,
@@ -112,7 +111,7 @@ module.exports = class Queries {
             .map(review => review.rating)
             .reduce((total, currentRating) => total + currentRating, 0) / souvenir.reviews.length;
 
-        await souvenir.save();
+        return await souvenir.save();
         // Данный метод должен добавлять отзыв к сувениру souvenirId, отзыв добавляется
         // в конец массива (чтобы сохранить упорядоченность по дате),
         // содержит login, rating, text - из аргументов,
