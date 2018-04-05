@@ -16,10 +16,10 @@ module.exports = class Queries {
             reviews: [reviewShema],
             name: String,
             image: String,
-            price: { type: String, index: true },
+            price: { type: Number, index: true },
             amount: Number,
             country: { type: String, index: true },
-            rating: { type: String, index: true },
+            rating: { type: Number, index: true },
             isRecent: Boolean,
             __v: Number
         });
