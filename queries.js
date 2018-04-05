@@ -62,8 +62,8 @@ module.exports = class Queries {
     }
 
     getSouvenrisCount({ country, rating, price }) {
-        return this._Souvenir.find(
-            { country: country, rating: { $gte: rating }, price: { $lte: price } }).count();
+        return this._Souvenir.count(
+            { country, rating: { $gte: rating }, price: { $lte: price } });
     }
 
     searchSouvenirs(substring) {
@@ -71,7 +71,7 @@ module.exports = class Queries {
     }
 
     getDisscusedSouvenirs(date) {
-        return this._Souvenir.find({ 'review.0.date': { $gte: date } });
+        return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
     }
 
     deleteOutOfStockSouvenirs() {
