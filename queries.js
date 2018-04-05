@@ -123,15 +123,13 @@ module.exports = class Queries {
 
         let noteRating = rating;
         const note = await this._Souvenir.findOne({ _id: souvenirId });
-        for (const el of note.reviews) {
-            noteRating += el.rating;
-        }
+        noteRating += 0;
 
         noteRating = noteRating / (note.reviews.length + 1);
 
         return this._Souvenir.update(
             { _id: souvenirId },
-            { $push: { reviews: comment } }
+            { $push: { reviews: comment }, $set: { rating: noteRating } }
         );
     }
 
