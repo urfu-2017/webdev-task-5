@@ -28,7 +28,7 @@ module.exports = class Queries {
             items: [
                 { souvenirId: mongoose.Schema.Types.ObjectId, amount: Number }
             ],
-            login: { type: String, unique: true },
+            login: String,
             __v: Number
         });
 
@@ -123,7 +123,9 @@ module.exports = class Queries {
 
         let noteRating = rating;
         const note = await this._Souvenir.findOne({ _id: souvenirId });
-        noteRating += 0;
+        for (const el of note.reviews) {
+            noteRating += el.rating;
+        }
 
         noteRating = noteRating / (note.reviews.length + 1);
 
@@ -143,7 +145,7 @@ module.exports = class Queries {
         for (const el of user.items) {
             const note = await this._Souvenir.findOne({ _id: el.souvenirId }, { price: 1 });
             if (note !== null) {
-                fullPrice += 0;
+                fullPrice += note.price * el.amount;
             }
         }
 
