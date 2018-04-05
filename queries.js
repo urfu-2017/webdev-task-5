@@ -113,22 +113,29 @@ module.exports = class Queries {
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
 
-        const comment = {
-            login,
-            rating,
-            text,
-            date: new Date(),
-            isApproved: false
-        };
+        let noteRating = rating;
+        const note = await this._Souvenir.findOne({ _id: souvenirId }, { rating: 1, reviews: 1 });
+        for (const el of note.reviews) {
+            noteRating += el.rating;
+        }
 
-        let noteRating = 0;
-        const note = await this._Souvenir.findOne({ _id: souvenirId });
-        noteRating = (note.rating * note.reviews.length + rating) / (note.reviews.length + 1);
+        noteRating = noteRating / (note.reviews.length + 1);
 
-        return await this._Souvenir.update(
+        await this._Souvenir.update(
             { _id: souvenirId },
-            { $push: { reviews: comment }, $set: { rating: noteRating } }
+            {
+                $set: { rating: noteRating },
+                $push: { reviews: {
+                    login,
+                    rating,
+                    text,
+                    date: new Date(),
+                    isApproved: false
+                } }
+            }
         );
+
+        return true;
     }
 
     async getCartSum(login) {
