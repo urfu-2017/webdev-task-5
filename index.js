@@ -13,7 +13,8 @@ const Queries = require('./queries');
 
     try {
         // Здесь можно делать запросы, чтобы проверять, что они правильно работают
-        const result = await queries.getCartSum('steve');
+        const result = await queries.addReview('5abe65514d0c9d02c12eaf55',
+            { login: 'steve', rating: 5, text: 'test' });
 
         console.info(result);
     } catch (error) {

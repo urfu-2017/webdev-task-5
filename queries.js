@@ -3,7 +3,6 @@
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: mongoose.Schema.Types.ObjectId,
             login: String,
             date: Date,
             text: String,
@@ -13,14 +12,13 @@ module.exports = class Queries {
 
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема сувенира тут
-            _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
             name: String,
             reviews: [reviewSchema],
             image: String,
             price: Number,
             amount: Number,
-            country: String,
+            country: { type: String, index: true },
             rating: Number,
             isRecent: Boolean
         });
@@ -34,7 +32,6 @@ module.exports = class Queries {
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема сувенира тут
-            _id: mongoose.Schema.Types.ObjectId,
             items: [itemSchema],
             login: {
                 type: String, unique: true
@@ -72,7 +69,7 @@ module.exports = class Queries {
         // Кроме того, в ответе должны быть только поля name, image и price
         return this._Souvenir.find(
             {
-                tags: { $in: [tag] }
+                tags: tag
             },
             {
                 _id: 0,
@@ -101,19 +98,17 @@ module.exports = class Queries {
     searchSouvenirs(substring) {
         // Данный метод должен возвращать все сувениры, в название которых входит
         // подстрока substring. Поиск должен быть регистронезависимым
-        const reg = new RegExp(substring, 'i');
 
         return this._Souvenir.find({
-            name: reg
+            name: { $regex: substring, $options: 'i' }
         });
     }
 
     getDisscusedSouvenirs(date) {
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
-        const DATE = new Date(date);
 
-        return this._Souvenir.find({ 'reviews.0.date': { $gte: DATE } });
+        return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
     }
 
     deleteOutOfStockSouvenirs() {
@@ -133,32 +128,25 @@ module.exports = class Queries {
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
 
-        const item = await this._Souvenir.findOne({ _id: souvenirId },
-            { _id: 0, rating: 1, reviews: 1 });
-        const newRating = (item.rating * item.reviews.length + rating) / (item.reviews.length + 1);
+        const item = await this._Souvenir.findByIdAndUpdate(souvenirId);
 
-        await this._Souvenir.update(
-            { _id: souvenirId },
-            {
-                $set: { rating: newRating },
-                $push: { reviews: {
-                    login,
-                    rating,
-                    text,
-                    date: new Date(),
-                    isApproved: false
-                } }
-            });
+        item.reviews.push({
+            login,
+            rating,
+            text,
+            date: Date.now(),
+            isApproved: false
+        });
 
-        return true;
+        item.rating = item.reviews.reduce((acc, cur) => acc + cur.rating, 0) / item.reviews.length;
+        await item.save();
     }
 
     async getCartSum(login) {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        const cart = await this._Cart.findOne({ login });
-        const items = cart.items;
+        const { items } = await this._Cart.findOne({ login });
 
         return items.reduce(async (acc, { souvenirId, amount }) => {
             const { price } = await this._Souvenir.findOne({ _id: souvenirId });
