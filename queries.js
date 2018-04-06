@@ -128,7 +128,7 @@ module.exports = class Queries {
         let sum = 0;
         for (const item of cart.items) {
             const souvenir = await this._Souvenir.findById(item.souvenirId);
-            sum += souvenir.price * item.amount;
+            sum += souvenir ? souvenir.price * item.amount : 0;
         }
 
         return sum;
