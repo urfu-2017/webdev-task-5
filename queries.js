@@ -3,17 +3,9 @@
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
-        const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            login: String,
-            date: Date,
-            text: String,
-            rating: Number,
-            isApproved: Boolean
-        });
-
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             tags: [String],
-            reviews: [reviewSchema],
+            reviews: [mongoose.Schema.Types.Mixed],
             name: String,
             image: String,
             price: { type: Number, index: true },
@@ -28,7 +20,11 @@ module.exports = class Queries {
                 souvenirId: mongoose.Schema.Types.ObjectId,
                 amount: Number
             }],
-            login: { type: String, unique: true }
+            login: {
+                type: String,
+                index: true,
+                unique: true
+            }
         });
 
         cartSchema.virtual('items.souvenir', {
@@ -126,7 +122,7 @@ module.exports = class Queries {
         const reviewsCount = souvenir.reviews.length;
         souvenir.rating = (reviewsCount * souvenir.rating + rating) / (reviewsCount + 1);
 
-        return souvenir.save();
+        return await souvenir.save();
     }
 
     async getCartSum(login) {
