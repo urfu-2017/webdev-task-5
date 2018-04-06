@@ -22,7 +22,8 @@ module.exports = class Queries {
             amount: Number,
             country: { type: String, index: true },
             rating: { type: Number, index: true },
-            isRecent: Boolean
+            isRecent: Boolean,
+            __v: Number
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
@@ -35,7 +36,8 @@ module.exports = class Queries {
                 type: String,
                 index: true,
                 unique: true
-            }
+            },
+            __v: Number
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
