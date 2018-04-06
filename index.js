@@ -13,8 +13,9 @@ const Queries = require('./queries');
 
     try {
         // Здесь можно делать запросы, чтобы проверять, что они правильно работают
-        await queries.getCartSum('punisher');
+        const result = await queries.getCartSum('punisher');
 
+        console.info(result);
     } catch (error) {
         console.error(error);
     }

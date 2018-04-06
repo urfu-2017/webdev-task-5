@@ -97,6 +97,28 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
+        let souvenir = await this._Souvenir.find({ _id: souvenirId }, { _id: 0, reviews: 1 });
+        let reviews = souvenir.reviews;
+        reviews.push({
+            login: String(login),
+            date: new Date(),
+            text: String(text),
+            rating: parseInt(rating),
+            isApproved: false
+        });
+        let ratingsSum = 0;
+        for (let i = 0; i < reviews.length; i++) {
+            ratingsSum += reviews[i].rating;
+        }
+        await this._Souvenir.updateOne({ _id: souvenirId },
+            {
+                $set:
+                    {
+                        reviews: reviews,
+                        rating: ratingsSum / reviews.length
+                    }
+            }
+        );
     }
 
     async getCartSum(login) {
@@ -104,15 +126,16 @@ module.exports = class Queries {
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
         const cart = await this._Cart.where('login', login);
-        let ids = [];
+        let goods = [];
         cart[0].items.forEach(item => {
-            ids.push(item._doc.souvenirId);
+            goods.push({ id: item._doc.souvenirId, amount: item._doc.amount });
         });
-        const prices = await this._Souvenir.find({ _id: { $in: ids } }, { price: 1, _id: 0 });
         let sum = 0;
-        prices.forEach(price => {
-            sum += price.price;
-        });
+        for (let i = 0; i < goods.length; i++) {
+            let price = await this._Souvenir.find({ _id: goods[i].id }, { price: 1, _id: 0 });
+            goods[i].price = price[0].price;
+            sum += goods[i].price * goods[i].amount;
+        }
 
         return sum;
     }
