@@ -106,14 +106,11 @@ module.exports = class Queries {
             date: new Date(),
             isApproved: false
         });
-        const sum = souvenir.reviews.reduce((result, current) => {
-            result += current.rating;
+        souvenir.rating = souvenir.reviews.map(review => review.rating)
+            .reduce((sum, curRating) => sum + curRating, 0) / souvenir.reviews.length;
+        // souvenir.rating = sum / souvenir.reviews.length;
 
-            return result;
-        }, 0);
-        souvenir.rating = sum / souvenir.reviews.length;
-
-        return souvenir.save();
+        return await souvenir.save();
         // Данный метод должен добавлять отзыв к сувениру souvenirId, отзыв добавляется
         // в конец массива (чтобы сохранить упорядоченность по дате),
         // содержит login, rating, text - из аргументов,
