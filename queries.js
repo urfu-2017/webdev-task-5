@@ -74,7 +74,6 @@ module.exports = class Queries {
     }
 
     getDisscusedSouvenirs(date) {
-        // this._Souvenir.find({ 'reviews.login': { $gte: date } });
         return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
@@ -83,9 +82,7 @@ module.exports = class Queries {
     deleteOutOfStockSouvenirs() {
         // Данный метод должен удалять все сувениры, которых нет в наличии
         // (то есть amount = 0)
-        const result = this._Souvenir.remove({ amount: 0 });
-
-        return result;
+        return this._Souvenir.remove({ amount: 0 });
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
     }
@@ -101,7 +98,6 @@ module.exports = class Queries {
         });
         souvenir.rating = souvenir.reviews.map(review => review.rating)
             .reduce((sum, curRating) => sum + curRating, 0) / souvenir.reviews.length;
-        // souvenir.rating = sum / souvenir.reviews.length;
 
         return await souvenir.save();
         // Данный метод должен добавлять отзыв к сувениру souvenirId, отзыв добавляется
@@ -112,7 +108,6 @@ module.exports = class Queries {
     }
 
     async getCartSum(login) {
-        // const cart = await this._Cart.find({ login }).exec();
         const cart = await this._Cart.findOne({ login });
 
         let sum = 0;
@@ -122,14 +117,6 @@ module.exports = class Queries {
         }
 
         return sum;
-
-        // return cart.items.reduce(async (result, current) => {
-        //     const souvenir = await this._Souvenir.findById(current.souvenirId);
-        //     result += souvenir.price * current.amount;
-        //
-        //     return result;
-        // }, 0);
-
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
