@@ -13,7 +13,7 @@ const Queries = require('./queries');
 
     try {
         // Здесь можно делать запросы, чтобы проверять, что они правильно работают
-        const result = await queries.addReview();
+        const result = await queries.getTopRatingSouvenirs(2);
 
         console.info(result);
     } catch (error) {

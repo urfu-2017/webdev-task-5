@@ -39,8 +39,8 @@ module.exports = class Queries {
 
     getTopRatingSouvenirs(n) {
         // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
-        return this._Souvenir.where()
-            .desc('rating')
+        return this._Souvenir.find()
+            .sort({ rating: -1 })
             .limit(n);
     }
 
@@ -92,27 +92,47 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-        return this._Souvenir.findById(souvenirId).then(souvenir => {
-            if (!souvenir) {
-                return;
-            }
-            const ratingSum = Math.round(souvenir.rating * souvenir.reviews.length);
-            souvenir.reviews.push({ login, rating, text, date: new Date(), isApproved: false });
-            souvenir.rating = (ratingSum + rating) / souvenir.reviews.length;
-
-            return souvenir.save();
+        let souvenir = await this._Souvenir.find({ _id: souvenirId }, { _id: 0, reviews: 1 });
+        const reviews = souvenir[0]._doc.reviews;
+        reviews.push({
+            login: String(login),
+            date: new Date(),
+            text: String(text),
+            rating: parseFloat(rating),
+            isApproved: false
         });
+        let ratingsSum = 0;
+        for (let i = 0; i < reviews.length; i++) {
+            ratingsSum += reviews[i].rating;
+        }
 
+        return await this._Souvenir.updateOne({ _id: souvenirId },
+            {
+                $set:
+                    {
+                        reviews: reviews,
+                        rating: ratingsSum / reviews.length
+                    }
+            }
+        );
     }
 
     async getCartSum(login) {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        return this._Cart.findOne({ login })
-            .populate({ path: 'items.souvenirId', select: 'price', model: this._Souvenir })
-            .then(cart => cart
-                ? cart.items.map(i => i.amount * i.souvenirId.price).reduce((i, j) => i + j, 0)
-                : 0);
+        const cart = await this._Cart.where('login', login);
+        let goods = [];
+        cart[0].items.forEach(item => {
+            goods.push({ id: item._doc.souvenirId, amount: item._doc.amount });
+        });
+        let sum = 0;
+        for (let i = 0; i < goods.length; i++) {
+            let price = await this._Souvenir.find({ _id: goods[i].id }, { price: 1, _id: 0 });
+            goods[i].price = price[0].price;
+            sum += goods[i].price * goods[i].amount;
+        }
+
+        return sum;
     }
 };
