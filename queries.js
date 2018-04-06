@@ -87,7 +87,7 @@ module.exports = class Queries {
 
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
-        // return this._Souvenir.delete({ 'amount': 0 });
+        return this._Souvenir.deleteMany({ 'amount': 0 });
     }
 
     async addReview(souvenirId, { login, rating, text }) {
@@ -109,10 +109,10 @@ module.exports = class Queries {
     async getCartSum(login) {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
-        // в схеме
-        const cart = await this._Cart.findOne({ login }).populate('items.souvenirId');
-
-        return cart.items
-            .reduce((total, current) => total + current.souvenirId.price * current.amount, 0);
+        // // в схеме
+        // const cart = await this._Cart.findOne({ login }).populate('items.souvenirId');
+        return login;
+        // return cart.items
+        //     .reduce((total, current) => total + current.souvenirId.price * current.amount, 0);
     }
 };
