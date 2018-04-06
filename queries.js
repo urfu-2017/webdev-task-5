@@ -110,7 +110,8 @@ module.exports = class Queries {
         for (let i = 0; i < reviews.length; i++) {
             ratingsSum += reviews[i].rating;
         }
-        await this._Souvenir.updateOne({ _id: souvenirId },
+
+        return await this._Souvenir.updateOne({ _id: souvenirId },
             {
                 $set:
                     {
