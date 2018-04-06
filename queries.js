@@ -25,7 +25,7 @@ module.exports = class Queries {
             tags: [String]
         });
 
-        souvenirSchema.index({ country: 1 });
+        souvenirSchema.index({ country: 1, rating: 1, price: 1 });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема корзины тут
