@@ -21,7 +21,7 @@ const Queries = require('./queries');
             text: 'test text'
         });
         */
-        const result = await queries.getCartSum('steve');
+        const result = await queries.getSouvenirsByTag('ракушка');
 
         console.info(result);
     } catch (error) {

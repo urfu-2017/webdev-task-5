@@ -76,6 +76,7 @@ module.exports = class Queries {
                     $all: [tag]
                 }
             }, {
+                _id: 0,
                 name: 1,
                 image: 1,
                 price: 1
@@ -182,20 +183,11 @@ module.exports = class Queries {
                 $in: Object.keys(itemsObj)
             }
         }, {
-            price: 1,
-            amount: 1
+            price: 1
         });
 
-        console.info(souvenirs);
-
         return souvenirs.reduce(
-            (sum, next) =>
-                sum +
-                (itemsObj[next._id].amount >= next.amount
-                    ? itemsObj[next._id].amount
-                    : next.amount
-                ) *
-                next.price, 0
+            (sum, next) => sum + itemsObj[next._id].amount * next.price, 0
         );
     }
 };
