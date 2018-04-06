@@ -24,10 +24,10 @@ module.exports = class Queries {
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            items: [mongoose.Schema({ // eslint-disable-line new-cap
+            items: [{ // eslint-disable-line new-cap
                 souvenirId: mongoose.Schema.Types.ObjectId,
                 amount: Number
-            })],
+            }],
             login: {
                 type: String,
                 index: true,
@@ -117,25 +117,21 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-        const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
+        const souvenir = await this._Souvenir.findOne({ '_id': souvenirId });
 
         const reviewsCount = souvenir.reviews.length;
-        const updatedRating = (souvenir.rating * reviewsCount + rating) / (reviewsCount + 1);
+        souvenir.rating = (reviewsCount * souvenir.rating + rating) / (reviewsCount + 1);
+
         const review = {
             login,
             rating,
             text,
-            isApproved: false,
-            date: new Date()
+            date: new Date(),
+            isApproved: false
         };
+        souvenir.reviews.push(review);
 
-        return await this._Souvenir.update(
-            { _id: souvenirId },
-            {
-                $push: { reviews: review },
-                $set: { rating: updatedRating }
-            }
-        );
+        return await souvenir.save();
     }
 
     async getCartSum(login) {
