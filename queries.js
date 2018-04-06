@@ -62,12 +62,12 @@ module.exports = class Queries {
         // и ценой меньше или равной price
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
-        return { country, rating, price };
-        // return this.getAllSouvenirs()
-        //     .where({ country })
-        //     .where('rating').gte(rating)
-        //     .where('price').lte(price)
-        //     .count();
+        return this.getAllSouvenirs()
+            .count({
+                country,
+                rating: { $gte: rating },
+                price: { $lte: price }
+            });
     }
 
     searchSouvenirs(substring) {
