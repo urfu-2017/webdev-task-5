@@ -98,7 +98,7 @@ module.exports = class Queries {
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
         let souvenir = await this._Souvenir.find({ _id: souvenirId }, { _id: 0, reviews: 1 });
-        let reviews = souvenir.reviews;
+        const reviews = souvenir[0]._doc.reviews;
         reviews.push({
             login: String(login),
             date: new Date(),
