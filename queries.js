@@ -5,7 +5,6 @@ module.exports = class Queries {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             tags: [String],
             reviews: [{
-                id: String,
                 login: String,
                 date: {
                     type: Date,
@@ -95,7 +94,7 @@ module.exports = class Queries {
         // поэтому учтите это при определении схем
         return this._Souvenir
             .find({
-                country,
+                country: country,
                 rating: {
                     $gte: rating
                 },
@@ -120,7 +119,7 @@ module.exports = class Queries {
         return this._Souvenir
             .find({
                 'reviews.0.date': {
-                    $gte: date
+                    $gt: date
                 }
             });
     }
@@ -131,9 +130,9 @@ module.exports = class Queries {
 
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
-        return this._Souvenir.deleteMany({
+        return this._Souvenir.remove({
             amount: 0
-        }).exec();
+        });
     }
 
     async addReview(souvenirId, { login, rating, text }) {
@@ -145,10 +144,12 @@ module.exports = class Queries {
         const souvenir = await this._Souvenir.findOne({
             _id: souvenirId
         });
-        const newRating = (souvenir
+
+        const oldRating = souvenir
             .reviews
-            .reduce((sum, next) => sum + next.rating, 0) + rating) /
-            (souvenir.reviews.length + 1);
+            .reduce((sum, next) => sum + next.rating, 0);
+
+        const newRating = (oldRating + rating) / (souvenir.reviews.length + 1);
 
         return this._Souvenir
             .update({
@@ -176,7 +177,7 @@ module.exports = class Queries {
         });
 
         const itemsObj = cart.items.reduce((obj, next) => {
-            obj[next.souvenirId] = next;
+            obj[next.souvenirId] = next.amount;
 
             return obj;
         }, {});
@@ -190,7 +191,7 @@ module.exports = class Queries {
         });
 
         return souvenirs.reduce(
-            (sum, next) => sum + itemsObj[next._id].amount * next.price, 0
+            (sum, next) => sum + itemsObj[next._id] * next.price, 0
         );
     }
 };
