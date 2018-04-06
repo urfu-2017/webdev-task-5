@@ -11,14 +11,7 @@ module.exports = class Queries {
             rating: { type: Number, index: true },
             isRecent: Boolean,
             tags: [String],
-            reviews: [{
-                id: String,
-                login: String,
-                date: Date,
-                text: String,
-                rating: Number,
-                isApproved: Boolean
-            }]
+            reviews: [mongoose.Schema.Types.Mixed]
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
