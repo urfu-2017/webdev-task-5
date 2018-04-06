@@ -26,9 +26,9 @@ module.exports = class Queries {
         });
 
         const itemSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            souvenirId: mongoose.Schema.Types.ObjectId,
             tags: [String],
             reviews: [reviewSchema],
-            souvenirId: mongoose.Schema.Types.ObjectId,
             amount: Number
         });
 
@@ -72,7 +72,7 @@ module.exports = class Queries {
         // Кроме того, в ответе должны быть только поля name, image и price
         return this._Souvenir.find(
             {
-                tags: tag
+                tags: { $in: [tag] }
             },
             {
                 _id: 0,
@@ -133,12 +133,10 @@ module.exports = class Queries {
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
 
-        // Беру сувенир, чтобы высчитать новый рейтинг
         const item = await this._Souvenir.findOne({ _id: souvenirId },
             { _id: 0, rating: 1, reviews: 1 });
         const newRating = (item.rating * item.reviews.length + rating) / (item.reviews.length + 1);
 
-        // Обновляю
         await this._Souvenir.update(
             { _id: souvenirId },
             {
