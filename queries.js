@@ -127,7 +127,7 @@ module.exports = class Queries {
 
         return cart.items.reduce(async (result, current) => {
             const souvenir = await this._Souvenir.findById(current.souvenirId);
-            result += souvenir.price;
+            result += souvenir.price * current.amount;
 
             return result;
         }, 0);
