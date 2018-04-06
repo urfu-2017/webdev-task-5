@@ -4,10 +4,35 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема сувенира тут
+            _id: mongoose.Schema.Types.ObjectId,
+            tags: [String],
+            name: String,
+            reviews: [mongoose.Schema({ // eslint-disable-line new-cap
+                _id: mongoose.Schema.Types.ObjectId,
+                login: String,
+                date: Date,
+                text: String,
+                rating: Number,
+                isApproved: Boolean
+            })],
+            image: String,
+            price: Number,
+            amount: Number,
+            country: { type: String, index: true },
+            rating: Number,
+            isRecent: Boolean
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема корзины тут
+            _id: mongoose.Schema.Types.ObjectId,
+            items: [mongoose.Schema({ // eslint-disable-line new-cap
+                souvenirId: { type: mongoose.Schema.Types.ObjectId, ref: 'Souvenir' },
+                amount: Number
+            })],
+            login: {
+                type: String, unique: true
+            }
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
