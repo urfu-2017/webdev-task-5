@@ -3,7 +3,7 @@
 const mongoose = require('mongoose');
 const Queries = require('./queries');
 
-const req = async function () {
+(async () => {
     await mongoose.connect('mongodb://localhost/webdev-task-5');
 
     const queries = new Queries(mongoose, {
@@ -13,7 +13,7 @@ const req = async function () {
 
     try {
         // Здесь можно делать запросы, чтобы проверять, что они правильно работают
-        const result = await queries.getCartSum('steve');
+        const result = await queries.getAllSouvenirs();
 
         console.info(result);
     } catch (error) {
@@ -21,6 +21,4 @@ const req = async function () {
     }
 
     await mongoose.disconnect();
-};
-
-req();
+})();
