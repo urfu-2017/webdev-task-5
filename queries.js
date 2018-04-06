@@ -2,6 +2,7 @@
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
+
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
@@ -94,15 +95,15 @@ module.exports = class Queries {
         // в конец массива (чтобы сохранить упорядоченность по дате),
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
-        const souvenir = await this._Souvenir.findById(souvenirId);
-        const review = { login, rating, text, date: new Date(), isApproved: false };
-        const reviewsCount = souvenir.reviews.length;
-        const newRating = (souvenir.rating * reviewsCount + rating) / (reviewsCount + 1);
+        // const souvenir = await this._Souvenir.findById(souvenirId);
+        // const review = { login, rating, text, date: new Date(), isApproved: false };
+        // const reviewsCount = souvenir.reviews.length;
+        // const newRating = (souvenir.rating * reviewsCount + rating) / (reviewsCount + 1);
 
-        souvenir.reviews.push(review);
-        souvenir.rating = newRating;
+        // souvenir.reviews.push(review);
+        // souvenir.rating = newRating;
 
-        return await souvenir.save();
+        // return await souvenir.save();
     }
 
     async getCartSum(login) {
