@@ -1,7 +1,9 @@
+'use strict';
+
 const mongoose = require('mongoose');
 const Queries = require('./queries');
 
-(async function () {
+const req = async function () {
     await mongoose.connect('mongodb://localhost/webdev-task-5');
 
     const queries = new Queries(mongoose, {
@@ -11,12 +13,14 @@ const Queries = require('./queries');
 
     try {
         // Здесь можно делать запросы, чтобы проверять, что они правильно работают
-        const result = await queries.getAllSouvenirs();
+        const result = await queries.getCartSum('steve');
 
-        console.log(result);
+        console.info(result);
     } catch (error) {
         console.error(error);
     }
 
     await mongoose.disconnect();
-})();
+};
+
+req();
