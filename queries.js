@@ -5,8 +5,8 @@ const sum = arr => arr.reduce((a, b) => a + b, 0);
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            _id: mongoose.Schema.Types.ObjectId,
             date: { type: Date, default: Date.now },
-            id: String,
             isApproved: { type: Boolean, default: false },
             login: String,
             rating: { type: Number, min: 0, max: 5 },
@@ -114,11 +114,11 @@ module.exports = class Queries {
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
         const review = { login, rating, text };
-        const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
+        const souvenir = await this._Souvenir.findById(souvenirId);
+        const raitingSum = souvenir.rating * souvenir.reviews.length + rating;
 
-        souvenir.rating =
-            (souvenir.rating * souvenir.reviews.length + rating) / (souvenir.reviews.length + 1);
         souvenir.reviews.push(review);
+        souvenir.rating = raitingSum / souvenir.reviews.length;
 
         return await souvenir.save();
     }
