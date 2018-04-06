@@ -21,8 +21,7 @@ module.exports = class Queries {
             amount: Number,
             country: { type: String, index: true },
             rating: { type: Number, index: true },
-            isRecent: Boolean,
-            __v: Number
+            isRecent: Boolean
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
@@ -31,13 +30,11 @@ module.exports = class Queries {
             items: [mongoose.Schema({// eslint-disable-line new-cap
                 souvenirId: {
                     type: mongoose.Schema.Types.ObjectId,
-                    ref: 'Souvenir',
-                    alias: 'souvenir'
+                    ref: 'Souvenir'
                 },
                 amount: Number
             })],
-            login: { type: String, unique: true },
-            __v: Number
+            login: { type: String, unique: true }
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
@@ -49,7 +46,7 @@ module.exports = class Queries {
 
     getAllSouvenirs() {
         // Данный метод должен возвращать все сувениры
-        this._Souvenir.find();
+        return this._Souvenir.find();
     }
 
     getCheapSouvenirs(price) {
