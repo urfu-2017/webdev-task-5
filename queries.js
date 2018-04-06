@@ -107,7 +107,10 @@ module.exports = class Queries {
         // подстрока substring. Поиск должен быть регистронезависимым
         return this._Souvenir
             .find({
-                name: new RegExp(substring, 'i')
+                name: {
+                    $regex: substring,
+                    $options: 'i'
+                }
             });
     }
 
@@ -174,7 +177,7 @@ module.exports = class Queries {
             login
         });
 
-        const itemsObj = cart.items.reduce((obj, next) => {
+        const itemsAmountObj = cart.items.reduce((obj, next) => {
             obj[next.souvenirId] = next.amount;
 
             return obj;
@@ -182,14 +185,14 @@ module.exports = class Queries {
 
         const souvenirs = await this._Souvenir.find({
             _id: {
-                $in: Object.keys(itemsObj)
+                $in: Object.keys(itemsAmountObj)
             }
         }, {
             price: 1
         });
 
         return souvenirs.reduce(
-            (sum, next) => sum + itemsObj[next._id] * next.price, 0
+            (sum, next) => sum + itemsAmountObj[next._id] * next.price, 0
         );
     }
 };
