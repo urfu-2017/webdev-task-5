@@ -87,7 +87,7 @@ module.exports = class Queries {
     getDisscusedSouvenirs(date) {
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
-        return this._Souvenir.find({ 'reviews[0].date': { $gte: date } });
+        return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
     }
 
     deleteOutOfStockSouvenirs() {
