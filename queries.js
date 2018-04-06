@@ -4,7 +4,6 @@
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: mongoose.Schema.Types.ObjectId,
             login: String,
             date: Date,
             text: String,
@@ -13,7 +12,6 @@ module.exports = class Queries {
         });
 
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
             reviews: [reviewSchema],
             name: String,
@@ -26,7 +24,6 @@ module.exports = class Queries {
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: mongoose.Schema.Types.ObjectId,
             items: [mongoose.Schema({ // eslint-disable-line new-cap
                 souvenirId: mongoose.Schema.Types.ObjectId,
                 amount: Number
@@ -114,13 +111,31 @@ module.exports = class Queries {
             .where('amount', 0);
     }
 
-    async addReview() {
+    async addReview(souvenirId, { login, rating, text }) {
         // Данный метод должен добавлять отзыв к сувениру souvenirId, отзыв добавляется
         // в конец массива (чтобы сохранить упорядоченность по дате),
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-        throw new Error();
+        const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
+
+        const reviewsCount = souvenir.reviews.length;
+        const updatedRating = (souvenir.rating * reviewsCount + rating) / (reviewsCount + 1);
+        const review = {
+            login,
+            rating,
+            text,
+            isApproved: false,
+            date: new Date()
+        };
+
+        return await this._Souvenir.update(
+            { _id: souvenirId },
+            {
+                $push: { reviews: review },
+                $set: { rating: updatedRating }
+            }
+        );
     }
 
     async getCartSum(login) {
