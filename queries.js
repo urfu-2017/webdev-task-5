@@ -125,12 +125,20 @@ module.exports = class Queries {
         // const cart = await this._Cart.find({ login }).exec();
         const cart = await this._Cart.findOne({ login });
 
-        return cart.items.reduce(async (result, current) => {
-            const souvenir = await this._Souvenir.findById(current.souvenirId);
-            result += souvenir.price * current.amount;
+        let sum = 0;
+        for (const item of cart.items) {
+            const souvenir = await this._Souvenir.findById(item.souvenirId);
+            sum += souvenir.price * item.amount;
+        }
 
-            return result;
-        }, 0);
+        return sum;
+
+        // return cart.items.reduce(async (result, current) => {
+        //     const souvenir = await this._Souvenir.findById(current.souvenirId);
+        //     result += souvenir.price * current.amount;
+        //
+        //     return result;
+        // }, 0);
 
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
