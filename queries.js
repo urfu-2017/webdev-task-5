@@ -165,7 +165,7 @@ module.exports = class Queries {
         return items.reduce(async (acc, { souvenirId, amount }) => {
             const { price } = await this._Souvenir.findOne({ _id: souvenirId });
 
-            return acc + price * amount;
+            return acc + (price ? price : 0) * amount;
         }, 0);
     }
 };
