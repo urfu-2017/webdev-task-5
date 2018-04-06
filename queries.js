@@ -5,7 +5,7 @@ module.exports = class Queries {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             name: String,
             image: String,
-            price: Number,
+            price: { type: Number, index: true },
             amount: Number,
             country: { type: String, index: true },
             rating: { type: Number, index: true },
@@ -46,7 +46,7 @@ module.exports = class Queries {
     }
 
     getTopRatingSouvenirs(n) {
-        return this._Souvenir.find({})
+        return this._Souvenir.find()
             .sort({ rating: -1 })
             .limit(n);
         // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
@@ -107,7 +107,7 @@ module.exports = class Queries {
             isApproved: false
         });
         const sum = souvenir.reviews.reduce((result, current) => {
-            result += current;
+            result += current.rating;
 
             return result;
         }, 0);
