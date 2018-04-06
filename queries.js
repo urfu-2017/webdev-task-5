@@ -132,21 +132,10 @@ module.exports = class Queries {
         return await souvenir.save();
     }
 
-    async getCartSum(login) {
+    async getCartSum() {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        const cart = await this._Cart.findOne({ login })
-            .select('items')
-            .populate('items.souvenirId', 'price -_id');
-
-        if (!cart) {
-            return 0;
-        }
-
-        return cart.items.reduce(
-            (acc, curr) => acc + curr.amount * curr.souvenirId.price,
-            0
-        );
+        throw new Error();
     }
 };
