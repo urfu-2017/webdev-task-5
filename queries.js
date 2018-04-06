@@ -39,7 +39,7 @@ module.exports = class Queries {
 
     getTopRatingSouvenirs(n) {
         // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
-        return this._Souvenir.find()
+        return this._Souvenir.where()
             .sort({ rating: -1 })
             .limit(n);
     }
@@ -50,18 +50,20 @@ module.exports = class Queries {
         return this._Souvenir.find({ tags: tag }, { name: 1, image: 1, price: 1, _id: 0 });
     }
 
-    getSouvenrisCount({ country, rating, price }) {
+    async getSouvenrisCount({ country, rating, price }) {
         // Данный метод должен возвращать количество сувениров,
         // из страны country, с рейтингом больше или равной rating,
         // и ценой меньше или равной price
 
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
-        return this._Souvenir.where('country', country)
+        let souvenirs = await this._Souvenir.where('country', country)
             .where('rating')
             .gte(rating)
             .where('price')
             .lte(price);
+
+        return souvenirs.length;
     }
 
     searchSouvenirs(substring) {
