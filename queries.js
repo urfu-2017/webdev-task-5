@@ -4,18 +4,15 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема сувенира тут
-            _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
-
-            /* reviews: [mongoose.Schema({ // eslint-disable-line new-cap
+            reviews: [mongoose.Schema({ // eslint-disable-line new-cap
                 _id: mongoose.Schema.Types.ObjectId,
                 login: String,
                 date: Date,
                 text: String,
                 rating: { type: Number, default: 0, min: 0 },
                 isApproved: Boolean
-            })],*/
-            reviews: [mongoose.Schema.Types.Mixed],
+            })],
             name: String,
             image: String,
             price: { type: Number, index: true },
@@ -27,13 +24,10 @@ module.exports = class Queries {
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема корзины тут
-            _id: mongoose.Schema.Types.ObjectId,
-
-            /* items: [mongoose.Schema({ // eslint-disable-line new-cap
+            items: [mongoose.Schema({ // eslint-disable-line new-cap
                 souvenirId: mongoose.Schema.Types.ObjectId,
                 amount: { type: Number, min: 0 }
-            })],*/
-            items: [mongoose.Schema.Types.Mixed],
+            })],
             login: { type: String, unique: true }
         });
 
