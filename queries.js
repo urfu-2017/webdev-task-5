@@ -25,7 +25,7 @@ module.exports = class Queries {
             tags: [String]
         });
 
-        souvenirSchema.index({ rating: 1, price: 1 });
+        souvenirSchema.index({ country: 1 });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема корзины тут
@@ -114,13 +114,13 @@ module.exports = class Queries {
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
         const review = { login, rating, text };
+        const souvenir = await this._Souvenir.findById(souvenirId);
+        const raitingSum = souvenir.rating * souvenir.reviews.length + rating;
 
-        return await this._Souvenir.findByIdAndUpdate(souvenirId, souvenir => {
-            const raitingSum = souvenir.rating * souvenir.reviews.length + rating;
+        souvenir.reviews.push(review);
+        souvenir.rating = raitingSum / souvenir.reviews.length;
 
-            souvenir.reviews.push(review);
-            souvenir.rating = raitingSum / souvenir.reviews.length;
-        });
+        await souvenir.save();
     }
 
     async getCartSum(login) {
