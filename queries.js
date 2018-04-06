@@ -109,18 +109,10 @@ module.exports = class Queries {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        const cart = await this._Cart.where('login', login);
-        let goods = [];
-        cart[0].items.forEach(item => {
-            goods.push({ id: item._doc.souvenirId, amount: item._doc.amount });
-        });
-        let sum = 0;
-        for (let i = 0; i < goods.length; i++) {
-            let price = await this._Souvenir.find({ _id: goods[i].id }, { price: 1, _id: 0 });
-            goods[i].price = price[0].price;
-            sum += goods[i].price * goods[i].amount;
-        }
-
-        return sum;
+        return this._Cart.findOne({ login })
+            .populate({ path: 'items.souvenirId', select: 'price', model: this._Souvenir })
+            .then(cart => cart
+                ? cart.items.map(i => i.amount * i.souvenirId.price).reduce((i, j) => i + j, 0)
+                : 0);
     }
 };
