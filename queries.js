@@ -9,7 +9,7 @@ module.exports = class Queries {
             id: String,
             isApproved: { type: Boolean, default: false },
             login: String,
-            rating: Number,
+            rating: { type: Number, min: 0, max: 5 },
             text: String
         });
 
@@ -115,7 +115,7 @@ module.exports = class Queries {
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
         const review = { login, rating, text };
 
-        await this._Souvenir.findByIdAndUpdate(souvenirId, souvenir => {
+        return await this._Souvenir.findByIdAndUpdate(souvenirId, souvenir => {
             const raitingSum = souvenir.rating * souvenir.reviews.length + rating;
 
             souvenir.reviews.push(review);
@@ -127,12 +127,10 @@ module.exports = class Queries {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        const cart = await this._Cart.findOne({ login });
+        const cart = await this._Cart
+            .findOne({ login })
+            .populate({ path: 'items.souvenirId', model: 'Souvenir' });
 
-        return sum(cart.items.map(async item => {
-            const souvenir = await this._Cart.findById(item.souvenirId);
-
-            return souvenir.price * item.amount;
-        }));
+        return sum(cart.items.map(item => item.souvenirId.price * item.amount));
     }
 };
