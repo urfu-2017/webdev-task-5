@@ -2,20 +2,18 @@
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
-        const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: mongoose.Schema.Types.ObjectId,
-            login: String,
-            date: Date,
-            text: String,
-            rating: Number,
-            isApproved: Boolean
-        });
-
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
             name: String,
-            reviews: [reviewSchema],
+            reviews: [mongoose.Schema({ // eslint-disable-line new-cap
+                _id: mongoose.Schema.Types.ObjectId,
+                login: String,
+                date: Date,
+                text: String,
+                rating: Number,
+                isApproved: Boolean
+            })],
             image: String,
             price: Number,
             amount: Number,
@@ -24,16 +22,12 @@ module.exports = class Queries {
             isRecent: Boolean
         });
 
-        const itemSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            tags: [String],
-            reviews: [reviewSchema],
-            souvenirId: mongoose.Schema.Types.ObjectId,
-            amount: Number
-        });
-
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             _id: mongoose.Schema.Types.ObjectId,
-            items: [itemSchema],
+            items: [mongoose.Schema({ // eslint-disable-line new-cap
+                souvenirId: { type: mongoose.Schema.Types.ObjectId, ref: 'Souvenir' },
+                amount: Number
+            })],
             login: {
                 type: String, unique: true
             }
