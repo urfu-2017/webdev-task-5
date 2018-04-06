@@ -2,7 +2,6 @@
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
-
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
@@ -37,23 +36,26 @@ module.exports = class Queries {
     }
 
     getCheapSouvenirs(price) {
+        return price;
         // Данный метод должен возвращать все сувениры, цена которых меньше или равна price
-        return this.getAllSouvenirs()
-            .where('price').lte(price);
+        // return this.getAllSouvenirs()
+        //     .where('price').lte(price);
     }
 
     getTopRatingSouvenirs(n) {
+        return n;
         // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
-        return this.getAllSouvenirs()
-            .sort({ rating: 'desc' })
-            .limit(n);
+        // return this.getAllSouvenirs()
+        //     .sort({ rating: 'desc' })
+        //     .limit(n);
     }
 
     getSouvenirsByTag(tag) {
+        return tag;
         // Данный метод должен возвращать все сувениры, в тегах которых есть tag
         // Кроме того, в ответе должны быть только поля name, image и price
-        return this._Souvenir.find({ tags: tag })
-            .select(['name', 'image', 'price']);
+        // return this._Souvenir.find({ tags: tag })
+        //     .select(['name', 'image', 'price']);
     }
 
     getSouvenirsCount({ country, rating, price }) {
