@@ -31,7 +31,7 @@ module.exports = class Queries {
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             items: [{
-                souvenirId: mongoose.Schema.ObjectId,
+                souvenirId: mongoose.Schema.Types.ObjectId,
                 amount: Number
             }],
             login: {
@@ -176,6 +176,10 @@ module.exports = class Queries {
         const cart = await this._Cart.findOne({
             login
         });
+
+        if (!cart) {
+            return 0;
+        }
 
         const itemsAmountObj = cart.items.reduce((obj, next) => {
             obj[next.souvenirId] = next.amount;
