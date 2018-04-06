@@ -120,7 +120,7 @@ module.exports = class Queries {
         souvenir.reviews.push(review);
         souvenir.rating = raitingSum / souvenir.reviews.length;
 
-        await souvenir.save();
+        return await souvenir.save();
     }
 
     async getCartSum(login) {
