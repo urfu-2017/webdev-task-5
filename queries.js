@@ -77,14 +77,13 @@ module.exports = class Queries {
     }
 
     getSouvenirsByTag(tag) {
-        return this._Souvenir.find({ tags: tag })
-            .select('name image price');
+        return this._Souvenir.find({ tags: tag }, { name: 1, image: 1, price: 1, _id: 0 });
     }
 
     getSouvenrisCount({ country, rating, price }) {
         return this._Souvenir.find({ country,
-            'rating': { '$gte': rating },
-            'price': { '$lte': price } })
+            'rating': { $gte: rating },
+            'price': { $lte: price } })
             .count();
     }
 
