@@ -11,8 +11,8 @@ module.exports = class Queries {
             image: String,
             price: { type: Number, index: true },
             amount: Number,
-            country: String,
-            rating: Number,
+            country: { type: String, index: true },
+            rating: { type: Number, index: true },
             isRecent: Boolean
         });
 
@@ -109,10 +109,10 @@ module.exports = class Queries {
     async getCartSum(login) {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
-        // // в схеме
-        // const cart = await this._Cart.findOne({ login }).populate('items.souvenirId');
-        return login;
-        // return cart.items
-        //     .reduce((total, current) => total + current.souvenirId.price * current.amount, 0);
+        // в схеме
+        const cart = await this._Cart.findOne({ login }).populate('items.souvenirId');
+
+        return cart.items
+            .reduce((total, current) => total + current.souvenirId.price * current.amount, 0);
     }
 };
