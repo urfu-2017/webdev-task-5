@@ -23,7 +23,6 @@ module.exports = class Queries {
             isRecent: Boolean
         });
 
-
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             items: [{
                 souvenirId: mongoose.Schema.Types.ObjectId,
@@ -59,7 +58,7 @@ module.exports = class Queries {
     getTopRatingSouvenirs(n) {
         // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
         return this._Souvenir.find()
-            .sort('rating', -1)
+            .sort('-rating')
             .limit(n);
     }
 
@@ -114,7 +113,7 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-        const souvenir = await this._Souvenir.findOne(souvenirId);
+        const souvenir = await this._Souvenir.findOne({ '_id': souvenirId });
         const review = {
             login,
             rating,
@@ -134,11 +133,11 @@ module.exports = class Queries {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        const cart = this._Cart.findOne({ login })
+        let cart = await this._Cart.findOne({ login })
             .select('items')
             .populate('items.souvenir', 'price -_id');
 
-        return cart.items.reduce(
+        return cart.toObject().items.reduce(
             (acc, curr) => acc + curr.amount * curr.souvenir.price,
             0
         );
