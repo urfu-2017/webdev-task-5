@@ -4,8 +4,8 @@ const mongoose = require('mongoose');
 const Queries = require('./queries');
 
 (async () => {
-    // await mongoose.connect('mongodb://localhost/webdev-task-5');
-    await mongoose.connect('mongodb://localhost/task');
+    await mongoose.connect('mongodb://localhost/webdev-task-5');
+    // await mongoose.connect('mongodb://localhost/task');
 
     const queries = new Queries(mongoose, {
         souvenirsCollection: 'souvenirs',
