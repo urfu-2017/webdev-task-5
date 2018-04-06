@@ -101,12 +101,13 @@ module.exports = class Queries {
 
     async addReview(souvenirId, { login, rating, text }) {
         const newReview = { login, rating, text, id: uuidv1() };
-        const souvenir = await this._Souvenir.findByIdAndUpdate(souvenirId,
-            { $push: { reviews: newReview } });
-        const newRating = (souvenir.rating * souvenir.reviews.length + rating) /
-            (souvenir.reviews.length + 1);
 
-        this._Souvenir.findByIdAndUpdate(souvenirId, { $set: { rating: newRating } });
+        const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
+        souvenir.rating =
+            (souvenir.rating * souvenir.reviews.length + rating) / (souvenir.reviews.length + 1);
+        souvenir.reviews.push(newReview);
+
+        return await souvenir.save();
     }
 
     async getCartSum(login) {
