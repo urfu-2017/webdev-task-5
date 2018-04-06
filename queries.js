@@ -133,9 +133,13 @@ module.exports = class Queries {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        let cart = await this._Cart.findOne({ login })
+        const cart = await this._Cart.findOne({ login })
             .select('items')
             .populate('items.souvenir', 'price -_id');
+
+        if (!cart) {
+            return 0;
+        }
 
         return cart.toObject().items.reduce(
             (acc, curr) => acc + curr.amount * curr.souvenir.price,
