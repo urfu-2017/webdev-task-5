@@ -20,8 +20,7 @@ module.exports = class Queries {
             price: { type: Number, index: true },
             amount: Number,
             country: { type: String, index: true },
-            rating: { type: Number, index: true },
-            isRecent: Boolean
+            rating: { type: Number, index: true }
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
@@ -80,7 +79,7 @@ module.exports = class Queries {
     searchSouvenirs(substring) {
         // Данный метод должен возвращать все сувениры, в название которых входит
         // подстрока substring. Поиск должен быть регистронезависимым
-        return this._Souvenir.find({ name: { $regex: substring, $options: 'i' } });
+        return this._Souvenir.find({ 'name': { $regex: new RegExp(substring, 'i') } });
     }
 
     getDisscusedSouvenirs(date) {
