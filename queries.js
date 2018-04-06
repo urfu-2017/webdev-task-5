@@ -1,7 +1,5 @@
 'use strict';
 
-const uuidv1 = require('uuid/v1');
-
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
@@ -19,12 +17,8 @@ module.exports = class Queries {
             rating: Number,
             isResent: Boolean,
             tags: [String],
-            reviews: [{
-                _id: false,
-                id: {
-                    type: String,
-                    index: true
-                },
+            reviews: [mongoose.Schema({ // eslint-disable-line new-cap
+                _id: mongoose.Schema.Types.ObjectId,
                 login: String,
                 date: {
                     type: Date,
@@ -36,8 +30,7 @@ module.exports = class Queries {
                     type: Boolean,
                     default: false
                 }
-            }]
-
+            })]
         });
 
         souvenirSchema.index({ rating: 1, price: 1 });
@@ -72,7 +65,7 @@ module.exports = class Queries {
 
     getTopRatingSouvenirs(souvenirsNumber) {
         return this._Souvenir.find()
-            .sort({ rating: -1 })
+            .sort({ rating: 'desc' })
             .limit(souvenirsNumber);
     }
 
@@ -100,8 +93,7 @@ module.exports = class Queries {
     }
 
     async addReview(souvenirId, { login, rating, text }) {
-        const newReview = { login, rating, text, id: uuidv1() };
-
+        const newReview = { login, rating, text };
         const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
         souvenir.rating =
             (souvenir.rating * souvenir.reviews.length + rating) / (souvenir.reviews.length + 1);
