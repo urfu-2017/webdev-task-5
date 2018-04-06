@@ -103,6 +103,7 @@ module.exports = class Queries {
         // souvenir.reviews.push(review);
         // souvenir.rating = newRating;
 
+        return { login, rating, text };
         // return await souvenir.save();
     }
 
