@@ -62,7 +62,7 @@ module.exports = class Queries {
         // и ценой меньше или равной price
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
-        return this.getAllSouvenirs()
+        return this._Souvenir
             .count({
                 country,
                 rating: { $gte: rating },
