@@ -87,7 +87,7 @@ module.exports = class Queries {
 
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
-        return this._Souvenir.deleteMany({ 'amount': 0 });
+        // return this._Souvenir.delete({ 'amount': 0 });
     }
 
     async addReview(souvenirId, { login, rating, text }) {
@@ -95,16 +95,15 @@ module.exports = class Queries {
         // в конец массива (чтобы сохранить упорядоченность по дате),
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
-        // const souvenir = await this._Souvenir.findById(souvenirId);
-        // const review = { login, rating, text, date: new Date(), isApproved: false };
-        // const reviewsCount = souvenir.reviews.length;
-        // const newRating = (souvenir.rating * reviewsCount + rating) / (reviewsCount + 1);
+        const souvenir = await this._Souvenir.findById(souvenirId);
+        const review = { login, rating, text, date: new Date(), isApproved: false };
+        const reviewsCount = souvenir.reviews.length;
+        const newRating = (souvenir.rating * reviewsCount + rating) / (reviewsCount + 1);
 
-        // souvenir.reviews.push(review);
-        // souvenir.rating = newRating;
+        souvenir.reviews.push(review);
+        souvenir.rating = newRating;
 
-        return { login, rating, text };
-        // return await souvenir.save();
+        return await souvenir.save();
     }
 
     async getCartSum(login) {
