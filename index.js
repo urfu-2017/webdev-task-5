@@ -21,7 +21,11 @@ const Queries = require('./queries');
             text: 'test text'
         });
         */
-        const result = await queries.getSouvenirsByTag('ракушка');
+        const result = await queries.getSouvenrisCount({
+            country: 'Египет',
+            rating: 3,
+            price: 2000
+        });
 
         console.info(result);
     } catch (error) {

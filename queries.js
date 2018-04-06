@@ -22,7 +22,10 @@ module.exports = class Queries {
             image: String,
             price: Number,
             amount: Number,
-            country: String,
+            country: {
+                type: String,
+                index: true
+            },
             rating: Number,
             isRecent: Boolean
         });
@@ -117,7 +120,7 @@ module.exports = class Queries {
         return this._Souvenir
             .find({
                 'reviews.0.date': {
-                    $gt: date
+                    $gte: date
                 }
             });
     }
