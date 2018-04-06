@@ -117,7 +117,7 @@ module.exports = class Queries {
         return this._Souvenir
             .find({
                 'reviews.0.date': {
-                    $gt: date
+                    $gte: date
                 }
             });
     }
