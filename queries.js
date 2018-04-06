@@ -88,7 +88,7 @@ module.exports = class Queries {
     }
 
     searchSouvenirs(substring) {
-        return this._Souvenir.find({ name: { $regex: `/${substring}/i` } });
+        return this._Souvenir.find({ name: { $regex: substring, $options: 'i' } });
     }
 
     getDisscusedSouvenirs(date) {
@@ -96,7 +96,7 @@ module.exports = class Queries {
     }
 
     deleteOutOfStockSouvenirs() {
-        return this._Souvenir.deleteMany({ amount: 0 });
+        return this._Souvenir.remove({ amount: 0 });
     }
 
     async addReview(souvenirId, { login, rating, text }) {
