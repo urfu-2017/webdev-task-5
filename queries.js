@@ -2,34 +2,38 @@
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
+        const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            _id: mongoose.Schema.Types.ObjectId,
+            login: String,
+            date: Date,
+            text: String,
+            rating: Number,
+            isApproved: Boolean
+        });
+
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            // Ваша схема сувенира тут
             _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
             name: String,
-            reviews: [mongoose.Schema({ // eslint-disable-line new-cap
-                _id: mongoose.Schema.Types.ObjectId,
-                login: String,
-                date: Date,
-                text: String,
-                rating: Number,
-                isApproved: Boolean
-            })],
+            reviews: [reviewSchema],
             image: String,
             price: Number,
             amount: Number,
-            country: { type: String, index: true },
+            country: String,
             rating: Number,
             isRecent: Boolean
         });
 
+        const itemSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            tags: [String],
+            reviews: [reviewSchema],
+            souvenirId: mongoose.Schema.Types.ObjectId,
+            amount: Number
+        });
+
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            // Ваша схема корзины тут
             _id: mongoose.Schema.Types.ObjectId,
-            items: [mongoose.Schema({ // eslint-disable-line new-cap
-                souvenirId: { type: mongoose.Schema.Types.ObjectId, ref: 'Souvenir' },
-                amount: Number
-            })],
+            items: [itemSchema],
             login: {
                 type: String, unique: true
             }
@@ -153,11 +157,9 @@ module.exports = class Queries {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        // Получаю все товары в корзине
-        const cart = await this._Cart.findOne({ login: login });
+        const cart = await this._Cart.findOne({ login });
         const items = cart.items;
 
-        // Прохожу по каждому товару, узнаю его цену и коплю
         return items.reduce(async (acc, { souvenirId, amount }) => {
             const { price } = await this._Souvenir.findOne({ _id: souvenirId });
 
