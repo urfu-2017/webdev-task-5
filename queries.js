@@ -12,6 +12,7 @@ module.exports = class Queries {
         });
 
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            // Ваша схема сувенира тут
             _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
             name: String,
@@ -32,6 +33,7 @@ module.exports = class Queries {
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            // Ваша схема сувенира тут
             _id: mongoose.Schema.Types.ObjectId,
             items: [itemSchema],
             login: {
