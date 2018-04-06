@@ -14,11 +14,14 @@ const Queries = require('./queries');
 
     try {
         // Здесь можно делать запросы, чтобы проверять, что они правильно работают
+        /*
         const result = await queries.addReview('5abe65514d0c9d02c12eaf58', {
             login: 'test',
-            rating: 4,
+            rating: 5,
             text: 'test text'
         });
+        */
+        const result = await queries.getCartSum('steve');
 
         console.info(result);
     } catch (error) {
