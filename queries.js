@@ -28,7 +28,7 @@ module.exports = class Queries {
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             _id: mongoose.Schema.Types.ObjectId,
             items: [mongoose.Schema({ // eslint-disable-line new-cap
-                souvenirId: mongoose.Schema.Types.ObjectId,
+                souvenirId: { type: mongoose.Schema.Types.ObjectId, ref: 'Souvenir' },
                 amount: Number
             })],
             login: {
@@ -36,12 +36,6 @@ module.exports = class Queries {
                 index: true,
                 unique: true
             }
-        });
-
-        cartSchema.virtual('items.souvenir', {
-            ref: 'Souvenir',
-            localField: 'items.souvenirId',
-            foreignField: '_id'
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
@@ -142,14 +136,14 @@ module.exports = class Queries {
         // в схеме
         const cart = await this._Cart.findOne({ login })
             .select('items')
-            .populate('items.souvenir', 'price -_id');
+            .populate('items.souvenirId', 'price -_id');
 
         if (!cart) {
             return 0;
         }
 
-        return cart.toObject().items.reduce(
-            (acc, curr) => acc + curr.amount * curr.souvenir.price,
+        return cart.items.reduce(
+            (acc, curr) => acc + curr.amount * curr.souvenirId.price,
             0
         );
     }
