@@ -74,7 +74,7 @@ module.exports = class Queries {
         // Кроме того, в ответе должны быть только поля name, image и price
         return this._Souvenir
             .find({
-                tags: [tag]
+                tags: tag
             }, {
                 _id: 0,
                 name: 1,
