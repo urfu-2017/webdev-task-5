@@ -72,7 +72,7 @@ module.exports = class Queries {
 
     getTopRatingSouvenirs(souvenirsNumber) {
         return this._Souvenir.find()
-            .sort({ rating: 'desc' })
+            .sort({ rating: -1 })
             .limit(souvenirsNumber);
     }
 
