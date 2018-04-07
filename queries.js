@@ -6,13 +6,14 @@ module.exports = class Queries {
             // Ваша схема сувенира тут
             _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
-            reviews: [mongoose.Schema({ // eslint-disable-line new-cap
+            reviews: [mongoose.Schema({ // eslint-disable-line new-capgi
+                _id: mongoose.Schema.Types.ObjectId,
                 login: String,
                 date: Date,
                 text: String,
                 rating: { type: Number, default: 0, min: 0 },
                 isApproved: Boolean
-            }, { _id: false })],
+            })],
             name: String,
             image: String,
             price: { type: Number, index: true },
