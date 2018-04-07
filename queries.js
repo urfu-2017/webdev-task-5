@@ -6,7 +6,7 @@ module.exports = class Queries {
             // Ваша схема сувенира тут
             _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
-            reviews: [mongoose.Schema({ // eslint-disable-line new-capgi
+            reviews: [mongoose.Schema({ // eslint-disable-line new-cap
                 _id: mongoose.Schema.Types.ObjectId,
                 login: String,
                 date: Date,
