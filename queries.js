@@ -12,7 +12,7 @@ module.exports = class Queries {
             _id: Schema.ObjectId,
             tags: [String],
             reviews: [mongoose.Schema({ // eslint-disable-line new-cap
-                id: String,
+                _id: Schema.ObjectId,
                 login: String,
                 date: {
                     type: Date,
@@ -40,7 +40,7 @@ module.exports = class Queries {
                 type: Number,
                 index: true
             },
-            isRecent: false
+            isRecent: Boolean
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
@@ -147,7 +147,7 @@ module.exports = class Queries {
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
         let cart = await this._Cart.findOne({ login })
-            .populate({ path: 'items.souvenirId', model: this._Souvenir });
+            .populate({ path: 'items.souvenirId', model: 'Souvenir' });
 
         return cart.items.reduce((sum, current) =>
             sum + current.amount * current.souvenirId.price, 0);
