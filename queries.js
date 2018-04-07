@@ -149,7 +149,7 @@ module.exports = class Queries {
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
         let cart = await this._Cart.findOne({ login })
-            .populate({ path: 'items.souvenirId', model: this._Souvenir});
+            .populate({ path: 'items.souvenirId', model: this._Souvenir });
         let res = cart.items.reduce((sum, current) =>
             sum + current.amount * current.souvenirId.price, 0);
 
