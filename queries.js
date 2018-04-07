@@ -86,7 +86,7 @@ module.exports = class Queries {
         return this._Souvenir.find({ tags: tag }, { _id: 0, name: 1, image: 1, price: 1 });
     }
 
-    getSouvenirsCount({ country, rating, price }) {
+    getSouvenrisCount({ country, rating, price }) {
         // Данный метод должен возвращать количество сувениров,
         // из страны country, с рейтингом больше или равной rating,
         // и ценой меньше или равной price
@@ -137,11 +137,9 @@ module.exports = class Queries {
         let newRating = (souvenir.rating * souvenir.reviews.length + rating) /
             (souvenir.reviews.length + 1);
         souvenir.reviews.push({ login, rating, text });
+        souvenir.rating = newRating;
 
-        return this._Souvenir.update({ _id: souvenirId }, {
-            rating: newRating,
-            reviews: souvenir.reviews
-        });
+        return await souvenir.save();
     }
 
     async getCartSum(login) {
