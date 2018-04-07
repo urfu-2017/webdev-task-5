@@ -80,7 +80,7 @@ module.exports = class Queries {
         // Данный метод должен возвращать все сувениры, в название которых входит
         // подстрока substring. Поиск должен быть регистронезависимым
         return this._Souvenir
-            .find({ name: { $regex: substring } });
+            .find({ name: { $regex: substring, $options: 'i' } });
     }
 
     getDisscusedSouvenirs(date) {
