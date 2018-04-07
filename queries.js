@@ -15,7 +15,7 @@ module.exports = class Queries {
 
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             amount: { type: Number, min: 0 },
-            country: String,
+            country: { type: String, index: true },
             image: String,
             isRecent: Boolean,
             name: String,
@@ -25,14 +25,12 @@ module.exports = class Queries {
             tags: [String]
         });
 
-        souvenirSchema.index({ country: 1 });
-
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема корзины тут
             login: String,
             items: [{
                 amount: { type: Number, min: 0 },
-                souvenirId: mongoose.Schema.Types.ObjectId
+                souvenirId: { type: mongoose.Schema.Types.ObjectId, ref: 'Souvenir' }
             }]
         });
 
@@ -53,14 +51,15 @@ module.exports = class Queries {
         // Данный метод должен возвращать все сувениры, цена которых меньше или равна price
         return this._Souvenir
             .find()
-            .where({ price: { $lte: price } });
+            .where('price')
+            .lte(price);
     }
 
     getTopRatingSouvenirs(n) {
         // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
         return this._Souvenir
             .find()
-            .sort({ rating: -1 })
+            .sort('-rating')
             .limit(n);
     }
 
@@ -127,9 +126,7 @@ module.exports = class Queries {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        const cart = await this._Cart
-            .findOne({ login })
-            .populate({ path: 'items.souvenirId', model: 'Souvenir' });
+        const cart = await this._Cart.findOne({ login });
 
         return sum(cart.items.map(item => item.souvenirId.price * item.amount));
     }
