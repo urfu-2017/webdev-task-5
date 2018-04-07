@@ -135,7 +135,7 @@ module.exports = class Queries {
         let souvenir = await this._Souvenir.findOne({ _id: souvenirId });
         let summaryRating = souvenir.reviews
             .reduce((summary, review) => summary + review.rating, 0);
-        let newRating = ((summaryRating + rating) / (souvenir.reviews.length + 1)).toFixed(1);
+        let newRating = ((summaryRating + rating) / (souvenir.reviews.length + 1));
         souvenir.reviews.push({ login, rating, text });
 
         return this._Souvenir.update({ _id: souvenirId }, {
@@ -148,8 +148,10 @@ module.exports = class Queries {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        let cart = await this._Cart.findOne({ login });
-        let res = cart.items.reduce((sum, current) => sum + current.amount, 0);
+        let cart = await this._Cart.findOne({ login })
+            .populate({ path: 'items.souvenirId', model: this._Souvenir});
+        let res = cart.items.reduce((sum, current) =>
+            sum + current.amount * current.souvenirId.price, 0);
 
         return res;
     }

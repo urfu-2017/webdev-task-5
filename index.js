@@ -25,7 +25,7 @@ const Queries = require('./queries');
         // result = await queries.deleteOutOfStockSouvenirs();
         // result = await queries.addReview('5abe65514d0c9d02c12eaf55',
         // { login: 'whoe', rating: 5, text: 'nice' });
-        result = await queries.getCartSum('justice');
+        result = await queries.getCartSum('steve');
 
         console.info(result);
     } catch (error) {
