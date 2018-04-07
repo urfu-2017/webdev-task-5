@@ -93,11 +93,11 @@ module.exports = class Queries {
 
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
-        return this._Souvenir.find({
+        return this._Souvenir.count({
             country,
             rating: { $gte: rating },
             price: { $lte: price }
-        }).count();
+        });
     }
 
     searchSouvenirs(substring) {
@@ -122,7 +122,7 @@ module.exports = class Queries {
 
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
-        return this._Souvenir.remove({ amount: { $eq: 0 } });
+        return this._Souvenir.remove({ amount: 0 });
 
     }
 
@@ -148,9 +148,8 @@ module.exports = class Queries {
         // в схеме
         let cart = await this._Cart.findOne({ login })
             .populate({ path: 'items.souvenirId', model: this._Souvenir });
-        let res = cart.items.reduce((sum, current) =>
-            sum + current.amount * current.souvenirId.price, 0);
 
-        return res;
+        return cart.items.reduce((sum, current) =>
+            sum + current.amount * current.souvenirId.price, 0);
     }
 };
