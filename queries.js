@@ -31,7 +31,9 @@ module.exports = class Queries {
     }
 
     getCheapSouvenirs(price) {
-        return this._Souvenir.find({ price: { $lte: price } });
+        return this._Souvenir.find()
+            .where('price')
+            .lte(price);
     }
 
     getTopRatingSouvenirs(n) {
