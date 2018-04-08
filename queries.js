@@ -42,11 +42,14 @@ module.exports = class Queries {
     }
 
     getSouvenirsByTag(tag) {
-        return this._Souvenir.find({ tags: tag }, { name: 1, image: 1, price: 1, _id: 0 });
+        return this._Souvenir.find({ tags: tag })
+            .select('name image price -_id');
     }
 
     getSouvenrisCount({ country, rating, price }) {
-        return this._Souvenir.count({ country, rating: { $gte: rating }, price: { $lte: price } });
+        return this._Souvenir.count({ country })
+            .where('rating').gte(rating)
+            .where('price').lte(price);
     }
 
     searchSouvenirs(substring) {
