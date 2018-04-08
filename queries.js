@@ -4,7 +4,7 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             _id: mongoose.Schema.Types.ObjectId,
-            tags: [],
+            tags: [String],
             reviews: [mongoose.Schema.Types.Mixed],
             name: String,
             image: String,
@@ -13,14 +13,12 @@ module.exports = class Queries {
             country: { type: String, index: true },
             rating: { type: Number, index: true },
             isRecent: Boolean,
-            __v: Number
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             _id: mongoose.Schema.Types.ObjectId,
             items: [mongoose.Schema.Types.Mixed],
             login: { type: String, unique: true },
-            __v: Number
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
@@ -72,12 +70,11 @@ module.exports = class Queries {
 
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
-        return this._Souvenir.find({
+        return this._Souvenir.count({
             country: country,
             rating: { $gte: rating },
             price: { $lte: price }
-        })
-            .count();
+        });
     }
 
     searchSouvenirs(substring) {
@@ -106,7 +103,7 @@ module.exports = class Queries {
         const newRating = (souvenir[0].rating * souvenir[0].reviews.length + rating) /
          (souvenir[0].reviews.length + 1);
 
-        return this._Souvenir.update({
+        return await this._Souvenir.update({
             _id: souvenirId
         }, {
             $push: {
