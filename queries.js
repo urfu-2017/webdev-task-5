@@ -4,7 +4,13 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = new mongoose.Schema({
             tags: [String],
-            reviews: [mongoose.Schema.Types.Mixed],
+            reviews: [{
+                login: String,
+                rating: Number,
+                text: String,
+                date: Date,
+                isApproved: Boolean
+            }],
             name: String,
             image: String,
             price: { type: Number, index: true },
