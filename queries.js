@@ -56,11 +56,15 @@ module.exports = class Queries {
     }
 
     searchSouvenirs(substring) {
-        return this._Souvenir.find({ name: { $regex: substring, $options: 'i' } });
+        return this._Souvenir
+            .where('name')
+            .regex(substring);
     }
 
     getDisscusedSouvenirs(date) {
-        return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
+        return this._Souvenir
+            .where('reviews.0.date')
+            .gte(date);
     }
 
     deleteOutOfStockSouvenirs() {
