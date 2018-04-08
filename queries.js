@@ -39,6 +39,7 @@ module.exports = class Queries {
     getTopRatingSouvenirs(n) {
         return this._Souvenir.find()
             .sort({ rating: -1 })
+            .limit(n);
     }
 
     getSouvenirsByTag(tag) {
@@ -48,8 +49,10 @@ module.exports = class Queries {
 
     getSouvenrisCount({ country, rating, price }) {
         return this._Souvenir.count({ country })
-            .where('rating').gte(rating)
-            .where('price').lte(price);
+            .where('rating')
+            .gte(rating)
+            .where('price')
+            .lte(price);
     }
 
     searchSouvenirs(substring) {
