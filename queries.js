@@ -58,7 +58,7 @@ module.exports = class Queries {
     searchSouvenirs(substring) {
         return this._Souvenir
             .where('name')
-            .regex(substring);
+            .regex(`/${substring}/i`);
     }
 
     getDisscusedSouvenirs(date) {
