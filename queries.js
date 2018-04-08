@@ -72,17 +72,16 @@ module.exports = class Queries {
     }
 
     async addReview(souvenirId, { login, rating, text }) {
-        return this._Souvenir.findById(souvenirId)
-            .then(souvenir => {
-                if (!souvenir) {
-                    return;
-                }
-                const ratingSum = Math.round(souvenir.rating * souvenir.reviews.length);
-                souvenir.reviews.push({ login, rating, text, date: new Date(), isApproved: false });
-                souvenir.rating = (ratingSum + rating) / souvenir.reviews.length;
+        const souvenir = await this._Souvenir.findById(souvenirId);
+        if (!souvenir) {
+            return;
+        }
+        const ratingSum = Math.round(souvenir.rating * souvenir.reviews.length);
 
-                return souvenir.save();
-            });
+        return souvenir.update({
+            $set: { rating: (ratingSum + rating) / (souvenir.reviews.length + 1) },
+            $push: { reviews: { login, rating, text, date: new Date(), isApproved: false } }
+        });
     }
 
     async getCartSum(login) {
