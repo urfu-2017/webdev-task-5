@@ -85,10 +85,9 @@ module.exports = class Queries {
     }
 
     async getCartSum(login) {
-        return this._Cart.findOne({ login })
-            .populate({ path: 'items.souvenirId', select: 'price', model: this._Souvenir })
-            .then(cart => cart
-                ? cart.items.map(i => i.amount * i.souvenirId.price).reduce((i, j) => i + j, 0)
-                : 0);
+        const cart = await this._Cart.findOne({ login })
+            .populate({ path: 'items.souvenirId', select: 'price', model: this._Souvenir });
+
+        return cart ? cart.items.reduce((i, j) => i + j.amount * j.souvenirId.price, 0) : 0;
     }
 };
