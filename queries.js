@@ -56,7 +56,9 @@ module.exports = class Queries {
     }
 
     searchSouvenirs(substring) {
-        return this._Souvenir.find({ name: { $regex: substring, $options: 'i' } });
+        return this._Souvenir
+            .where('name')
+            .regex(new RegExp(substring, 'i'));
     }
 
     getDisscusedSouvenirs(date) {
