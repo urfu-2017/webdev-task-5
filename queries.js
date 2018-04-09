@@ -2,39 +2,33 @@
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
-        const review = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: mongoose.Schema.Types.ObjectId,
+        const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
             login: { type: String, required: true },
-            date: { type: Date, required: true },
-            text: String,
+            text: { type: String, required: true },
             rating: { type: Number, required: true },
-            isApproved: { type: Boolean, required: true }
-        });
+            isApproved: { type: Boolean, required: true, default: false }
+        }, { timestamps: { createdAt: 'date' } });
 
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
-            reviews: [review],
+            reviews: [reviewSchema],
             name: { type: String, required: true },
             image: String,
             price: { type: Number, required: true, index: true },
-            amount: { type: Number, required: true },
+            amount: { type: Number, required: true, default: 0 },
             country: { type: String, required: true, index: true },
             rating: { type: Number, required: true, index: true },
-            isRecent: { type: Boolean, required: true },
-            _v: { type: Number, required: true }
+            isRecent: { type: Boolean, required: true }
         });
 
-        const item = mongoose.Schema({ // eslint-disable-line new-cap
-            souvenirId: { type: mongoose.Schema.Types.ObjectId, required: true },
-            amount: { type: Number, required: true }
+        const itemSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            souvenirId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'Souvenir' },
+            amount: { type: Number, required: true, default: 1 }
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: mongoose.Schema.Types.ObjectId,
-            items: [item],
-            login: { type: String, required: true, unique: true },
-            _v: { type: Number, required: true }
+            items: [itemSchema],
+            login: { type: String, required: true, unique: true }
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
@@ -62,9 +56,7 @@ module.exports = class Queries {
     }
 
     getSouvenrisCount({ country, rating, price }) {
-        return this._Souvenir.count({ country: country,
-            rating: { $gte: rating },
-            price: { $lte: price } });
+        return this._Souvenir.count({ country, rating: { $gte: rating }, price: { $lte: price } });
     }
 
     searchSouvenirs(substring) {
@@ -80,25 +72,20 @@ module.exports = class Queries {
     }
 
     async addReview(souvenirId, { login, rating, text }) {
-        const { reviews } =
-            await this._Souvenir.findById(souvenirId, { reviews: 1, _id: 0 });
+        const { reviews } = await this._Souvenir.findById(souvenirId, { reviews: 1, _id: 0 });
         const newRating = (reviews.reduce((currentRating, review) =>
             (currentRating += review.rating), 0) + rating) / (reviews.length + 1);
 
         return this._Souvenir.update({ _id: souvenirId }, {
             $set: { rating: newRating },
-            $push: { reviews:
-            { login: login, rating: rating, text: text, date: Date.now(), isApproved: false } } });
+            $push: { reviews: { login, rating, text } }
+        });
     }
 
     async getCartSum(login) {
-        let cartSum = 0;
-        const { items } = await this._Cart.findOne({ login: login }, { items: 1, _id: 0 });
-        for (let i = 0; i < items.length; i++) {
-            cartSum += (await this._Souvenir.findById(
-                items[i].souvenirId, { price: 1, _id: 0 })).price * items[i].amount;
-        }
+        const cart = await this._Cart.findOne({ login }).populate('items.souvenirId');
 
-        return cartSum;
+        return cart.items.reduce(
+            (cartSum, souvenir) => (cartSum + souvenir.souvenirId.price * souvenir.amount), 0);
     }
 };
