@@ -7,7 +7,7 @@ module.exports = class Queries {
             text: { type: String, required: true },
             rating: { type: Number, required: true },
             isApproved: { type: Boolean, required: true, default: false }
-        }, { timestamps: { createdAt: 'date' } });
+        }, { timestamps: { createdAt: 'date' }, _id: false });
 
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             tags: [String],
