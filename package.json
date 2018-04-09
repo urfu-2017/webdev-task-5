@@ -3,7 +3,7 @@
   "main": "index.js",
   "scripts": {
     "lint": "eslint .",
-    "test": "npm run lint"
+    "test": "npm run lint && mocha */*.spec.js"
   },
   "dependencies": {
     "eslint": "4.18.0",
