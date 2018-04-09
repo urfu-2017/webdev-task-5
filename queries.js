@@ -105,7 +105,8 @@ module.exports = class Queries {
         const review = { login: login, rating: rating, text: text,
             isApproved: false, date: new Date() };
         const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
-        const newRating = (souvenir.rating * souvenir.reviews.length + rating) / (souvenir.reviews.length + 1)
+        const newRating = (souvenir.rating * souvenir.reviews.length + rating) /
+		    (souvenir.reviews.length + 1)
         await this._Souvenir.update({ _id: souvenirId }, { $push: { 'reviews': review },
             $set: { 'rating': newRating } });
     }
