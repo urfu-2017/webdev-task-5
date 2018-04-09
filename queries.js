@@ -3,6 +3,7 @@
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            _id: mongoose.Schema.Types.ObjectId,
             login: String,
             date: Date,
             text: String,
@@ -14,6 +15,7 @@ module.exports = class Queries {
         }, { timestamps: { createdAt: 'date' } });
 
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
             name: {
                 type: String,
