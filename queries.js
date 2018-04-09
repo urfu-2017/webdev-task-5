@@ -6,6 +6,7 @@ module.exports = class Queries {
             // Ваша схема сувенира тут
             tags: [String],
             reviews: [mongoose.Schema({ // eslint-disable-line new-cap
+                _id: mongoose.Schema.Types.ObjectId,
                 login: String,
                 date: Date,
                 text: String,
@@ -103,7 +104,7 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-        const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
+        const souvenir = await this._Souvenir.findById(souvenirId);
         souvenir.rating = (souvenir.rating * souvenir.reviews.length + rating) /
             (souvenir.reviews.length + 1);
         souvenir.reviews.push({ login, text, rating });
