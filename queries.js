@@ -3,21 +3,29 @@
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: mongoose.Schema.Types.ObjectId,
             login: String,
             date: Date,
             text: String,
             rating: Number,
-            isApproved: Boolean
-        });
+            isApproved: {
+                type: Boolean,
+                default: false
+            }
+        }, { timestamps: { createdAt: 'date' } });
 
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: mongoose.Schema.Types.ObjectId,
             tags: [String],
-            name: String,
+            name: {
+                type: String,
+                required: true
+            },
             reviews: [reviewSchema],
             image: String,
-            price: Number,
+            price: {
+                type: Number,
+                required: true,
+                default: 0
+            },
             amount: Number,
             country: String,
             rating: Number,
@@ -25,14 +33,14 @@ module.exports = class Queries {
         });
 
         const itemSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            tags: [String],
-            reviews: [reviewSchema],
             souvenirId: mongoose.Schema.Types.ObjectId,
-            amount: Number
+            amount: {
+                type: Number,
+                default: 1
+            }
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: mongoose.Schema.Types.ObjectId,
             items: [itemSchema],
             login: {
                 type: String, unique: true
@@ -97,9 +105,9 @@ module.exports = class Queries {
     getDisscusedSouvenirs(date) {
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
-        const DATE = new Date(date);
+        const dateNow = new Date(date);
 
-        return this._Souvenir.find({ 'reviews.0.date': { $gte: DATE } });
+        return this._Souvenir.find({ 'reviews.0.date': { $gte: dateNow } });
     }
 
     deleteOutOfStockSouvenirs() {
@@ -120,9 +128,9 @@ module.exports = class Queries {
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
 
         // Беру сувенир, чтобы высчитать новый рейтинг
-        let item = await this._Souvenir.findOne({ _id: souvenirId },
+        const item = await this._Souvenir.findOne({ _id: souvenirId },
             { _id: 0, rating: 1, reviews: 1 });
-        let newRating = (item.rating * item.reviews.length + rating) / (item.reviews.length + 1);
+        const newRating = (item.rating * item.reviews.length + rating) / (item.reviews.length + 1);
 
         // Обновляю
         await this._Souvenir.update({ _id: souvenirId }, {
@@ -130,9 +138,7 @@ module.exports = class Queries {
             $push: { reviews: {
                 login,
                 rating,
-                text,
-                date: new Date(),
-                isApproved: false
+                text
             } }
         });
 
@@ -151,8 +157,8 @@ module.exports = class Queries {
         let sum = 0;
         for (let i = 0; i < items.length; i++) {
             let price = 0;
-            const itemID = items[i].souvenirId;
-            const souvenir = await this._Souvenir.findOne({ _id: itemID });
+            const itemID = String(items[i].souvenirId);
+            const souvenir = await this._Souvenir.findById(itemID, 'price');
             if (souvenir) {
                 price = souvenir.price;
             }
