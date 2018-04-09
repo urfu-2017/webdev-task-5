@@ -5,6 +5,7 @@ module.exports = class Queries {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             tags: [String],
             reviews: [{
+                _id: mongoose.Schema.Types.ObjectId,
                 login: String,
                 date: Date,
                 text: String,
@@ -74,7 +75,8 @@ module.exports = class Queries {
     async searchSouvenirs(substring) {
         // Данный метод должен возвращать все сувениры, в название которых входит
         // подстрока substring. Поиск должен быть регистронезависимым
-        return await this._Souvenir.find({ 'name': { '$regex': `^.*${substring}.*$` } });
+        return [substring];
+        // return await this._Souvenir.find({ 'name': { '$regex': `^.*${substring}.*$` } });
     }
 
     async getDisscusedSouvenirs(date) {
