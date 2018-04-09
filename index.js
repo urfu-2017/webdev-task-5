@@ -12,7 +12,7 @@ const Queries = require('./queries');
     });
 
     try {
-        const result = await queries.getAllSouvenirs();
+        const result = await queries.getCartSum('funnyguy');
 
         console.info(result);
     } catch (error) {

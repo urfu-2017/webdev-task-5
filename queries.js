@@ -2,30 +2,33 @@
 
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
-        const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: mongoose.Schema.Types.ObjectId,
-            login: String,
-            date: Date,
-            text: String,
-            rating: Number,
-            isApproved: Boolean
-        });
+        const reviewSchema = mongoose.Schema( // eslint-disable-line new-cap
+            {
+                login: String,
+                text: { type: String, required: true },
+                rating: Number,
+                isApproved: { type: Boolean, default: false }
+            },
+            {
+                timestamps: { createdAt: 'date', updatedAt: false }
+            }
+        );
 
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             tags: [String],
             reviews: [reviewSchema],
-            name: String,
+            name: { type: String, required: true },
             image: String,
-            price: { type: Number, index: true },
-            amount: Number,
+            price: { type: Number, index: true, required: true },
+            amount: { type: Number, default: 0 },
             country: { type: String, index: true },
             rating: { type: Number, index: true },
             isRecent: Boolean
         });
 
         const cartItemSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            souvenirId: mongoose.Schema.Types.ObjectId,
-            amount: Number
+            souvenirId: { type: mongoose.Schema.Types.ObjectId, required: true },
+            amount: { type: Number, default: 1 }
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
@@ -107,7 +110,7 @@ module.exports = class Queries {
      * @returns {Query}
      */
     searchSouvenirs(substring) {
-        return this._Souvenir.find({ name: { $regex: `.*${substring}.*`, $options: 'i' } });
+        return this._Souvenir.find({ name: { $regex: new RegExp(`.*${substring}.*`, 'i') } });
     }
 
 
@@ -143,25 +146,14 @@ module.exports = class Queries {
      * @returns {Query}
      */
     async addReview(souvenirId, { login, rating, text }) {
-        return this._Souvenir
-            .findById(souvenirId)
-            .then(souvenir => {
-                souvenir.reviews.push(
-                    {
-                        login,
-                        rating,
-                        text,
-                        date: new Date(),
-                        isApproved: false
-                    }
-                );
-                let overallRating = souvenir.reviews.reduce((accumulator, review) => {
-                    return accumulator + review.rating;
-                }, 0);
-                souvenir.rating = overallRating / souvenir.reviews.length;
+        const souvenir = await this._Souvenir.findById(souvenirId);
+        souvenir.reviews.push({ login, rating, text });
+        const overallRating = souvenir.reviews.reduce((accumulator, review) => {
+            return accumulator + review.rating;
+        }, 0);
+        souvenir.rating = overallRating / souvenir.reviews.length;
 
-                return souvenir.save();
-            });
+        return souvenir.save();
     }
 
     /**
@@ -170,22 +162,16 @@ module.exports = class Queries {
      * @returns {Query}
      */
     async getCartSum(login) {
-        return this._Cart
-            .findOne({ login })
-            .then(cart => {
-                const promises = cart.items.reduce((accumulator, cartItem) => {
-                    const promise = this._Souvenir.findById(cartItem.souvenirId)
-                        .then(souvenir => souvenir.price * cartItem.amount);
-                    accumulator.push(promise);
+        const cart = await this._Cart.findOne({ login });
+        const souvenirsIds = cart.items.map(item => item.souvenirId);
+        const souvenirs = await this._Souvenir.find({ _id: { $in: souvenirsIds } });
 
-                    return accumulator;
-                }, []);
-
-                return Promise.all(promises).then(prices => {
-                    return prices.reduce((accumulator, souvenirPrice) => {
-                        return accumulator + souvenirPrice;
-                    }, 0);
-                });
+        return cart.items.reduce((accumulator, cartItem) => {
+            const appropriateSouvenir = souvenirs.find(souvenir => {
+                return souvenir._id.equals(cartItem.souvenirId);
             });
+
+            return accumulator + appropriateSouvenir.price * cartItem.amount;
+        }, 0);
     }
 };
