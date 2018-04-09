@@ -10,7 +10,8 @@ module.exports = class Queries {
                 isApproved: { type: Boolean, default: false }
             },
             {
-                timestamps: { createdAt: 'date', updatedAt: false }
+                timestamps: { createdAt: 'date', updatedAt: false },
+                _id: false
             }
         );
 
