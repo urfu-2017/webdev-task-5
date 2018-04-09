@@ -3,9 +3,9 @@
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            tags: Array,
+            tags: [String],
             reviews: [{
-                id: String,
+                _id: mongoose.Schema.Types.ObjectId,
                 login: String,
                 date: Date,
                 text: String,
@@ -16,7 +16,7 @@ module.exports = class Queries {
             image: String,
             price: Number,
             amount: Number,
-            country: String,
+            country: { type: String, index: true },
             rating: Number,
             isRecent: Boolean
         });
@@ -24,12 +24,12 @@ module.exports = class Queries {
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             items: [{
                 souvenirId: { type: mongoose.Schema.Types.ObjectId, ref: 'Souvenir' },
-                amount: {
-                    type: Number,
-                    unique: true
-                }
+                amount: Number
             }],
-            login: String
+            login: {
+                type: String,
+                unique: true
+            }
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
@@ -61,14 +61,14 @@ module.exports = class Queries {
             .select('name image price -_id');
     }
 
-    async getSouvenirsCount({ country, rating, price }) {
+    async getSouvenrisCount({ country, rating, price }) {
         // Данный метод должен возвращать количество сувениров,
         // из страны country, с рейтингом больше или равной rating,
         // и ценой меньше или равной price
 
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
-        return await this._Souvenir.count({ 'country': country, 'rating': { $gt: rating },
+        return await this._Souvenir.count({ 'country': country, 'rating': { $gte: rating },
             'price': { $lte: price } });
     }
 
@@ -81,7 +81,7 @@ module.exports = class Queries {
     async getDisscusedSouvenirs(date) {
         // Данный метод должен возвращать все сувениры,
         // первый отзыв на которые был оставлен не раньше даты date
-        return await this._Souvenir.find({ 'reviews.0.date': { $gt: date } });
+        return await this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
     }
 
     async deleteOutOfStockSouvenirs() {
