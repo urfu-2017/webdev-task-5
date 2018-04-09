@@ -56,7 +56,9 @@ module.exports = class Queries {
 
     getTopRatingSouvenirs(n) {
         // Данный метод должен возвращать топ n сувениров с самым большим рейтингом
-        return this._Souvenir.find().sort({ rating: -1 })
+        return this._Souvenir
+            .find()
+            .sort({ rating: -1 })
             .limit(n);
     }
 
