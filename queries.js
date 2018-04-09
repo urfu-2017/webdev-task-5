@@ -75,7 +75,7 @@ module.exports = class Queries {
     async searchSouvenirs(substring) {
         // Данный метод должен возвращать все сувениры, в название которых входит
         // подстрока substring. Поиск должен быть регистронезависимым
-         return await this._Souvenir.find({ 'name': { '$regex': substring, "$options": "i" } });
+        return await this._Souvenir.find({ 'name': { '$regex': substring, '$options': 'i' } });
     }
 
     async getDisscusedSouvenirs(date) {
