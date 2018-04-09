@@ -29,7 +29,7 @@ module.exports = class Queries {
                 souvenirId: mongoose.Schema.Types.ObjectId,
                 amount: Number
             })],
-            login: String
+            login: { type: String, unique: true }
         });
 
         this._Souvenir = mongoose.model('Souvenir', souvenirSchema, souvenirsCollection);
@@ -46,8 +46,8 @@ module.exports = class Queries {
     /*
     * Данный метод должен возвращать все сувениры, цена которых меньше или равна price
     */
-    getCheapSouvenirs($lte) {
-        return this._Souvenir.find({ price: { $lte } });
+    getCheapSouvenirs(price) {
+        return this._Souvenir.where('price').lte(price);
     }
 
     /*
@@ -55,7 +55,7 @@ module.exports = class Queries {
     */
     getTopRatingSouvenirs(n) {
         return this._Souvenir.find()
-            .sort({ rating: -1 })
+            .sort('-rating')
             .limit(n);
     }
 
@@ -64,7 +64,9 @@ module.exports = class Queries {
     * Кроме того, в ответе должны быть только поля name, image и price
     */
     getSouvenirsByTag(tag) {
-        return this._Souvenir.find({ tags: tag }, { name: 1, image: 1, price: 1, _id: 0 });
+        return this._Souvenir
+            .where('tags', tag)
+            .select({ name: 1, image: 1, price: 1, _id: 0 });
     }
 
     /*
@@ -72,8 +74,12 @@ module.exports = class Queries {
     * из страны country, с рейтингом больше или равной rating,
     * и ценой меньше или равной price
     */
-    getSouvenrisCount({ country, rating: $gte, price: $lte }) {
-        return this._Souvenir.find({ country, rating: { $gte }, price: { $lte } }).count();
+    getSouvenrisCount({ country, rating, price }) {
+        return this._Souvenir
+            .where('country', country)
+            .gte('rating', rating)
+            .lte('price', price)
+            .count();
     }
 
     /*
@@ -81,7 +87,7 @@ module.exports = class Queries {
     * подстрока substring. Поиск должен быть регистронезависимым
     */
     searchSouvenirs(substring) {
-        return this._Souvenir.find({ name: { $regex: new RegExp(substring, 'i') } });
+        return this._Souvenir.find().regex('name', new RegExp(substring, 'i'));
     }
 
     /*
@@ -99,7 +105,7 @@ module.exports = class Queries {
     * в случае успешного удаления
     */
     deleteOutOfStockSouvenirs() {
-        return this._Souvenir.find({ amount: 0 }).remove();
+        return this._Souvenir.remove({ amount: 0 });
     }
 
     /*
@@ -126,11 +132,16 @@ module.exports = class Queries {
     * в схеме
     */
     async getCartSum(login) {
-        const basket = (await this._Cart.findOne({ login })).items.reduce((result, current) =>
-            Object.assign(result, { [current.souvenirId]: current.amount }),
-        {});
+        const cart = await this._Cart.findOne({ login });
+        const souvenirsAmountMap = cart.items.reduce((res, cur) => Object.assign(res, {
+            [cur.souvenirId]: cur.amount
+        }), {});
 
-        return (await this._Souvenir.find({ _id: { $in: Object.keys(basket) } }, { price: 1 }))
-            .map(x => x.price * basket[x._id]).reduce((a, b) => a + b, 0);
+        return (await this._Souvenir
+            .where('_id')
+            .in(Object.keys(souvenirsAmountMap))
+            .select({ price: 1 }))
+            .map(x => x.price * souvenirsAmountMap[x._id])
+            .reduce((a, b) => a + b, 0);
     }
 };
