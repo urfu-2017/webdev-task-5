@@ -107,17 +107,15 @@ module.exports = class Queries {
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
         let updatedReviews = [];
         let updatedRating = 0;
-        await this._Souvenir.find({ _id: souvenirId })
-            .then(entryArr => {
-                const reviews = entryArr[0].reviews;
-                reviews.push({
-                    login, date: new Date(), text, rating, isApproved: false
-                });
-                updatedReviews = reviews;
-                updatedRating = reviews.reduce((acc, entry, idx) => {
-                    return (acc * idx + entry.rating) / (idx + 1);
-                }, 0);
-            });
+        const entryArr = await this._Souvenir.find({ _id: souvenirId });
+        const reviews = entryArr[0].reviews;
+        reviews.push({
+            login, date: new Date(), text, rating, isApproved: false
+        });
+        updatedReviews = reviews;
+        updatedRating = reviews.reduce((acc, entry, idx) => {
+            return (acc * idx + entry.rating) / (idx + 1);
+        }, 0);
         await this._Souvenir.update({ _id: souvenirId },
             { $set: { rating: updatedRating, reviews: updatedReviews } });
     }
@@ -129,18 +127,17 @@ module.exports = class Queries {
         let total = 0;
         const ids = [];
         const amounts = [];
-        await this._Cart.find({ login }).then(res => {
-            res[0].items.forEach(souvenir => {
-                ids.push(souvenir.souvenirId);
-                amounts.push(souvenir.amount);
-            });
+        const cart = await this._Cart.find({ login });
+        cart[0].items.forEach(souvenir => {
+            ids.push(souvenir.souvenirId);
+            amounts.push(souvenir.amount);
         });
-        await this._Souvenir.find({ _id: { $in: ids } }).then(res => {
-            amounts.reverse();
-            total = res.reduce((acc, souvenir, idx) => {
-                return acc + souvenir.price * amounts[idx];
-            }, 0);
-        });
+
+        const souvenirs = await this._Souvenir.find({ _id: { $in: ids } });
+        amounts.reverse();
+        total = souvenirs.reduce((acc, souvenir, idx) => {
+            return acc + souvenir.price * amounts[idx];
+        }, 0);
 
         return total;
     }
