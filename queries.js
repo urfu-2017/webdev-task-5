@@ -15,10 +15,22 @@ module.exports = class Queries {
                 isApproved: mongoose.Schema.Types.Boolean
             })],
             image: mongoose.Schema.Types.String,
-            price: { type: mongoose.Schema.Types.Number, index: true },
-            amount: mongoose.Schema.Types.Number,
+            price: {
+                type: mongoose.Schema.Types.Number,
+                index: true,
+                min: 0
+            },
+            amount: {
+                type: mongoose.Schema.Types.Number,
+                min: 0
+            },
             country: { type: mongoose.Schema.Types.String, index: true },
-            rating: { type: mongoose.Schema.Types.Number, index: true },
+            rating: {
+                type: mongoose.Schema.Types.Number,
+                index: true,
+                min: 1,
+                max: 5
+            },
             isRecent: mongoose.Schema.Types.Boolean
         });
 
@@ -37,7 +49,7 @@ module.exports = class Queries {
 
     // Данный метод должен возвращать все сувениры
     getAllSouvenirs() {
-        return this._Souvenir.find({}).exec();
+        return this._Souvenir.find();
     }
 
     // Данный метод должен возвращать все сувениры, цена которых меньше или равна price
@@ -96,8 +108,7 @@ module.exports = class Queries {
     deleteOutOfStockSouvenirs() {
         return this._Souvenir
             .where('amount', 0)
-            .remove()
-            .exec();
+            .remove();
     }
 
     // Данный метод должен добавлять отзыв к сувениру souvenirId, отзыв добавляется
@@ -106,7 +117,7 @@ module.exports = class Queries {
     // date - текущая дата и isApproved - false
     // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
     async addReview(souvenirId, { login, rating, text }) {
-        const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
+        const souvenir = await this._Souvenir.findById(souvenirId);
 
         const date = new Date();
         const isApproved = false;
@@ -126,18 +137,20 @@ module.exports = class Queries {
         const items = cart[0].items;
         const souvenirIds = items.map(item => item.souvenirId);
 
-        const souvenirs = (await this._Souvenir
+        const souvenirs = await this._Souvenir
             .where('_id').in(souvenirIds)
             .select('_id price amount')
-            .exec())
-            .reduce((result, souvenir) => {
-                result[souvenir._id] = souvenir;
+            .exec();
 
-                return result;
-            }, {});
+        const souvenirsMap = souvenirs.reduce((result, souvenir) => {
+            result[souvenir._id] = souvenir;
+
+            return result;
+        }, {});
+
 
         return items.reduce((total, item) => {
-            const souvenir = souvenirs[item.souvenirId] || { price: 0, amount: 0 };
+            const souvenir = souvenirsMap[item.souvenirId] || { price: 0, amount: 0 };
             const amount = Math.min(item.amount, souvenir.amount);
 
             return total + souvenir.price * amount;
