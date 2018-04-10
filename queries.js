@@ -68,12 +68,12 @@ module.exports = class Queries {
 
     searchSouvenirs(substring) {
         return this._Souvenir
-            .find({ $text: { $search: substring, $caseSensitive: false } });
+            .find({ $text: { $search: `"${substring}"`, $caseSensitive: false } });
     }
 
     getDisscusedSouvenirs(date) {
         return this._Souvenir
-            .find({ 'revies.0.date': { $gte: date } });
+            .find({ 'reviews.0.date': { $gte: date } });
     }
 
     deleteOutOfStockSouvenirs() {
