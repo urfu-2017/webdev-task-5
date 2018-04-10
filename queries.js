@@ -4,24 +4,28 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             tags: [String],
-            reviews: [mongoose.Schema.Types.Mixed],
+            reviews: [{
+                login: String,
+                date: Date,
+                text: String,
+                rating: Number,
+                isApproved: Boolean
+            }],
             name: String,
             image: String,
             price: { type: Number, index: true },
             amount: Number,
             country: { type: String, index: true },
             rating: { type: Number, index: true },
-            isRecent: Boolean,
-            __v: Number
+            isRecent: Boolean
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            login: { type: String },
+            login: { type: String, unique: true },
             items: [{
                 souvenirId: mongoose.Schema.Types.ObjectId,
                 amount: Number
-            }],
-            __v: Number
+            }]
         });
 
         this._Souvenir = mongoose.model('Souvenir', souvenirSchema, souvenirsCollection);
@@ -93,8 +97,8 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-        let souvenir = await this._Souvenir.find({ _id: souvenirId }, { _id: 0, reviews: 1 });
-        const reviews = souvenir[0]._doc.reviews;
+        let souvenir = await this._Souvenir.findOne({ _id: souvenirId }, { _id: 0, reviews: 1 });
+        const reviews = souvenir._doc.reviews;
         reviews.push({
             login: String(login),
             date: new Date(),
