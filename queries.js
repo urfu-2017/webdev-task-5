@@ -82,7 +82,7 @@ module.exports = class Queries {
     searchSouvenirs(substring) {
         // Данный метод должен возвращать все сувениры, в название которых входит
         // подстрока substring. Поиск должен быть регистронезависимым
-        this._Souvenir.find({ name: { $regex: substring, $options: 'i' } });
+        return this._Souvenir.find({ name: { $regex: substring, $options: 'i' } });
     }
 
     getDisscusedSouvenirs(date) {
@@ -132,7 +132,6 @@ module.exports = class Queries {
             ids.push(souvenir.souvenirId);
             amounts.push(souvenir.amount);
         });
-
         const souvenirs = await this._Souvenir.find({ _id: { $in: ids } });
         total = souvenirs.reduce((acc, souvenir, idx) => {
             return acc + souvenir.price * amounts[amounts.length - idx - 1];
