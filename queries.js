@@ -11,7 +11,11 @@ module.exports = class Queries {
                 login: mongoose.Schema.Types.String,
                 data: mongoose.Schema.Types.Date,
                 text: mongoose.Schema.Types.String,
-                rating: mongoose.Schema.Types.Number,
+                rating: {
+                    type: mongoose.Schema.Types.Number,
+                    min: 1,
+                    max: 5
+                },
                 isApproved: mongoose.Schema.Types.Boolean
             })],
             image: mongoose.Schema.Types.String,
