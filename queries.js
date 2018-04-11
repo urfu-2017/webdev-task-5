@@ -4,9 +4,9 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const reviewsSchema = mongoose.Schema({ // eslint-disable-line new-cap
             login: String,
-            date: Date,
+            date: { type: Date, default: Date.now },
             text: String,
-            rating: Number,
+            rating: { type: Number, min: 0, max: 10 },
             isApproved: Boolean
         }, { _id: false });
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
@@ -14,8 +14,8 @@ module.exports = class Queries {
             reviews: [reviewsSchema],
             name: String,
             image: String,
-            price: { type: Number, index: true },
-            amount: Number,
+            price: { type: Number, index: true, min: 0 },
+            amount: { type: Number, min: 0 },
             country: { type: String, index: true },
             rating: { type: Number, index: true },
             isRecent: Boolean
@@ -99,29 +99,23 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-        let souvenir = await this._Souvenir.findOne({ _id: souvenirId }, { _id: 0, reviews: 1 });
-        const reviews = souvenir._doc.reviews;
-        reviews.push({
-            login: String(login),
-            date: new Date(),
-            text: String(text),
-            rating: parseFloat(rating),
-            isApproved: false
-        });
-        let ratingsSum = 0;
-        for (let i = 0; i < reviews.length; i++) {
-            ratingsSum += reviews[i].rating;
-        }
+        return this._Souvenir.findOne({ _id: souvenirId }, { reviews: 1 })
+            .then(souvenir => {
+                let ratingsSum = 0;
+                for (let i = 0; i < souvenir._doc.reviews.length; i++) {
+                    ratingsSum += souvenir._doc.reviews[i].rating;
+                }
+                let newRating = ratingsSum / souvenir.reviews.length;
+                souvenir.reviews.push({
+                    login: login,
+                    text: text,
+                    rating: rating,
+                    isApproved: false
+                });
+                souvenir.rating = newRating;
 
-        return await this._Souvenir.updateOne({ _id: souvenirId },
-            {
-                $set:
-                    {
-                        reviews: reviews,
-                        rating: ratingsSum / reviews.length
-                    }
-            }
-        );
+                return souvenir.save();
+            });
     }
 
     async getCartSum(login) {
