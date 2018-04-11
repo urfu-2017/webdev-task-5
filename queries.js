@@ -102,17 +102,16 @@ module.exports = class Queries {
         return this._Souvenir.findOne({ _id: souvenirId }, { reviews: 1 })
             .then(souvenir => {
                 let ratingsSum = 0;
-                for (let i = 0; i < souvenir._doc.reviews.length; i++) {
-                    ratingsSum += souvenir._doc.reviews[i].rating;
-                }
                 souvenir.reviews.push({
                     login,
                     text,
                     rating,
                     isApproved: false
                 });
-                let newRating = ratingsSum / souvenir.reviews.length;
-                souvenir.rating = newRating;
+                for (let i = 0; i < souvenir._doc.reviews.length; i++) {
+                    ratingsSum += souvenir._doc.reviews[i].rating;
+                }
+                souvenir.rating = ratingsSum / souvenir.reviews.length;
 
                 return souvenir.save();
             });
