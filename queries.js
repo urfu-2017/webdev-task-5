@@ -105,13 +105,13 @@ module.exports = class Queries {
                 for (let i = 0; i < souvenir._doc.reviews.length; i++) {
                     ratingsSum += souvenir._doc.reviews[i].rating;
                 }
-                let newRating = ratingsSum / souvenir.reviews.length;
                 souvenir.reviews.push({
-                    login: login,
-                    text: text,
-                    rating: rating,
+                    login,
+                    text,
+                    rating,
                     isApproved: false
                 });
+                let newRating = ratingsSum / souvenir.reviews.length;
                 souvenir.rating = newRating;
 
                 return souvenir.save();
