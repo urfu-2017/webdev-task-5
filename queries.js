@@ -154,19 +154,24 @@ module.exports = class Queries {
         // Получаю все товары в корзине
         const cart = await this._Cart.findOne({ login: login });
         const items = cart.items;
+        // Массив id-ов товаров в корзине
+        const ids = [];
+        items.forEach(item => {
+            ids.push(item.souvenirId);
+        });
 
-        // Прохожу по каждому товару, узнаю его цену и коплю
+        // Ищу все товары подходящие запросом и дальше сопоставляю
         let sum = 0;
-        for (let i = 0; i < items.length; i++) {
-            let price = 0;
-            const itemID = String(items[i].souvenirId);
-            const souvenir = await this._Souvenir.findById(itemID, 'price');
-            if (souvenir) {
-                price = souvenir.price;
-            }
+        const souvenirs = await this._Souvenir.find({ _id: { $in: ids } }, { price: 1 });
+        souvenirs.forEach(souvenir => {
+            items.forEach(item => {
+                if (String(souvenir._id) === String(item.souvenirId)) {
+                    sum += souvenir.price * item.amount;
 
-            sum += items[i].amount * price;
-        }
+                    return true;
+                }
+            });
+        });
 
         return sum;
     }
