@@ -14,7 +14,11 @@ module.exports = class Queries {
                 min: 0
             },
             country: String,
-            rating: Number,
+            rating: {
+                type: Number,
+                min: 0,
+                max: 5
+            },
             isResent: Boolean,
             tags: [String],
             reviews: [mongoose.Schema({ // eslint-disable-line new-cap
@@ -33,7 +37,7 @@ module.exports = class Queries {
             })]
         });
 
-        souvenirSchema.index({ rating: 1, price: 1 });
+        souvenirSchema.index({ country: 1, rating: 1, price: 1 });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             login: {
@@ -74,9 +78,12 @@ module.exports = class Queries {
     }
 
     getSouvenrisCount({ country, rating, price }) {
-        return this._Souvenir.find({ country,
-            'rating': { $gte: rating },
-            'price': { $lte: price } })
+        return this._Souvenir
+            .where({ country })
+            .where('rating')
+            .gte(rating)
+            .where('price')
+            .lte(price)
             .count();
     }
 
@@ -99,7 +106,7 @@ module.exports = class Queries {
             (souvenir.rating * souvenir.reviews.length + rating) / (souvenir.reviews.length + 1);
         souvenir.reviews.push(newReview);
 
-        return await souvenir.save();
+        return souvenir.save();
     }
 
     async getCartSum(login) {
