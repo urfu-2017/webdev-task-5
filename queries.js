@@ -71,7 +71,7 @@ module.exports = class Queries {
     }
 
     searchSouvenirs(substring) {
-        return this._Souvenir.where('name').regex(substring, 'i');
+        return this._Souvenir.where('name').regex(new RegExp(substring, 'i'));
     }
 
     getDisscusedSouvenirs(date) {
@@ -98,7 +98,7 @@ module.exports = class Queries {
 
         let cost = 0;
         for (var item of basket.items) {
-            cost += item.souvenirId.price * item.amount;
+            cost += item.souvenirId * item.amount;
         }
 
         return cost;
