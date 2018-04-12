@@ -17,13 +17,14 @@ module.exports = class Queries {
             reviews: [reviewSchema],
             name: String,
             image: String,
-            price: { type: Number, index: true },
+            price: { type: Number },
             amount: Number,
-            country: { type: String, index: true },
-            rating: { type: Number, index: true },
+            country: { type: String },
+            rating: { type: Number },
             isRecent: Boolean,
             __v: Number
         });
+        souvenirSchema.index({ country: 1, rating: 1, price: 1 });
 
         const nestedSouvenirSchema = mongoose.Schema({
             souvenirId: mongoose.Schema.Types.ObjectId,
@@ -128,15 +129,12 @@ module.exports = class Queries {
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
         const cart = await this._Cart.findOne({ login: login });
-        const items = cart.items;
-        let sum = 0;
-        for (let i = 0; i < items.length; i++) {
-            const id = items[i].souvenirId;
-            const amount = items[i].amount;
-            const souvenir = await this._Souvenir.findOne({ _id: id });
-            sum += souvenir.price * amount;
-        }
+        const amounts = cart.items.reduce((obj, cur) =>
+            Object.assign(obj, { [cur.souvenirId]: cur.amount }), {});
+        const prices = await this._Souvenir
+            .find({ _id: { $in: Object.keys(amounts) } }, { price: 1 });
 
-        return sum;
+        return prices.reduce((acc, cur) =>
+            acc + cur.price * amounts[cur._id], 0);
     }
 };
