@@ -20,21 +20,18 @@ module.exports = class Queries {
             amount: Number,
             country: { type: String, index: true },
             rating: { type: Number, index: true },
-            isRecent: Boolean,
-            __v: Number
+            isRecent: Boolean
         });
 
         const itemShema = mongoose.Schema({ // eslint-disable-line new-cap
-            souvenirId: mongoose.Schema.Types.ObjectId,
+            souvenirId: { type: mongoose.Schema.Types.ObjectId, ref: 'Souvenir' },
             amount: Number
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             _id: mongoose.Schema.Types.ObjectId,
             items: [itemShema],
-            login: { type: String, unique: true },
-            __v: Number
-
+            login: { type: String, unique: true }
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
@@ -47,7 +44,7 @@ module.exports = class Queries {
     }
 
     getCheapSouvenirs(price) {
-        return this._Souvenir.find({ price: { $lte: price } });
+        return this._Souvenir.where('price').lte(price);
     }
 
     getTopRatingSouvenirs(n) {
@@ -58,23 +55,27 @@ module.exports = class Queries {
     }
 
     getSouvenirsByTag(tag) {
-        return this._Souvenir.find({ tags: tag }, { _id: 0, name: 1, image: 1, price: 1 });
+        return this._Souvenir
+            .where('tags', tag)
+            .select({ _id: 0, name: 1, image: 1, price: 1 });
     }
 
     getSouvenrisCount({ country, rating, price }) {
-        return this._Souvenir.count({
-            country,
-            rating: { $gte: rating },
-            price: { $lte: price }
-        });
+        return this._Souvenir
+            .where('country', country)
+            .where('rating')
+            .gte(rating)
+            .where('price')
+            .lte(price)
+            .count();
     }
 
     searchSouvenirs(substring) {
-        return this._Souvenir.find({ name: { $regex: new RegExp(substring, 'i') } });
+        return this._Souvenir.where('name').regex(substring, 'i');
     }
 
     getDisscusedSouvenirs(date) {
-        return this._Souvenir.find({ 'reviews.0.date': { $gte: date } });
+        return this._Souvenir.where('reviews.0.date').gte(date);
     }
 
     deleteOutOfStockSouvenirs() {
@@ -92,12 +93,12 @@ module.exports = class Queries {
     }
 
     async getCartSum(login) {
-        const basket = await this._Cart.findOne({ login });
+        const basket = await this._Cart.findOne({ login })
+            .populate('items.souvenirId');
+
         let cost = 0;
         for (var item of basket.items) {
-            const souvenir = await this._Souvenir.findById(item.souvenirId);
-            cost += souvenir.price * item.amount;
-
+            cost += item.souvenirId.price * item.amount;
         }
 
         return cost;
