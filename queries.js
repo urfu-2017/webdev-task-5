@@ -98,7 +98,7 @@ module.exports = class Queries {
 
         let cost = 0;
         for (var item of basket.items) {
-            cost += item.souvenirId * item.amount;
+            cost += item.souvenirId.price * item.amount;
         }
 
         return cost;
