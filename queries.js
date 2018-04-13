@@ -1,5 +1,4 @@
 'use strict';
-/* eslint-disable */
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({
@@ -105,15 +104,9 @@ module.exports = class Queries {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        return this._Cart.findOne({ login })
-            .then(async user => {
-                let res = 0;
-                for (var i = 0; i < user.items.length; i++) {
-                    const souvenir = await this._Souvenir.findById(user.items[i].souvenirId);
-                    res += souvenir.price * user.items[i].amount;
-                }
-
-                return res;
-            });
+        const user = await this._Cart.findOne({ login }).populate('items.souvenirId');
+        return user.items
+            .map(item => item.souvenirId ? item.souvenirId.price * item.amount : 0)
+            .reduce((total, price) => total + price, 0);
     }
 };
