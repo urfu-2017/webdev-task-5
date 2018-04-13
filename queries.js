@@ -55,7 +55,7 @@ module.exports = class Queries {
 
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
-        return this._Souvenir.count({  country: country,
+        return this._Souvenir.count({ country: country,
             rating: { $gte: rating }, price: { $lte: price } });
     }
 
@@ -88,8 +88,8 @@ module.exports = class Queries {
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
 
         const souvenir = await this._Souvenir.findById(souvenirId);
-        souvenir.rating = (souvenir.rating * souvenir.reviews.length + rating)
-            / (souvenir.reviews.length + 1);
+        souvenir.rating = (souvenir.rating * souvenir.reviews.length + rating) /
+            (souvenir.reviews.length + 1);
         souvenir.reviews.push(
             {
                 login,
