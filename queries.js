@@ -10,15 +10,15 @@ module.exports = class Queries {
             reviews: [mongoose.Schema({// eslint-disable-line new-cap
                 _id: mongoose.Schema.Types.ObjectId,
                 login: String,
-                date: Date,
+                date: { type: Date, default: Date.now },
                 text: String,
                 rating: Number,
                 isApproved: Boolean
             })],
             name: String,
             image: String,
-            price: { type: Number, index: true },
-            amount: Number,
+            price: { type: Number, index: true, min: 0 },
+            amount: { type: Number, min: 0 },
             country: { type: String, index: true },
             rating: { type: Number, index: true }
         });
@@ -103,15 +103,14 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-        const souvenir = await this._Souvenir.findOne({ _id: souvenirId });
+        const souvenir = await this._Souvenir.findById({ _id: souvenirId });
         souvenir.rating = (souvenir.rating * souvenir.reviews.length + rating) /
             (souvenir.reviews.length + 1);
         souvenir.reviews.push({
             login,
             text,
             rating,
-            isApproved: false,
-            date: new Date()
+            isApproved: false
         });
 
         return await souvenir.save();
