@@ -8,12 +8,13 @@ module.exports = class Queries {
             reviews: [mongoose.Schema.Types.Mixed],
             name: String,
             image: String,
-            price: { type: Number, index: true },
+            price: Number,
             amount: Number,
-            country: { type: String, index: true },
-            rating: { type: Number, index: true },
+            country: String,
+            rating: Number,
             isRecent: Boolean
         });
+        souvenirSchema.index({ price: 1, country: 1, rating: 1 });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             _id: mongoose.Schema.Types.ObjectId,
@@ -130,11 +131,11 @@ module.exports = class Queries {
         const customer = await this._Cart.find({ login: login });
         let items = customer[0].items;
         let sum = 0;
-        for (var i = 0; i < items.length; i++) {
-            let souvenir = await this._Souvenir.find({ _id: items[i].souvenirId });
-            sum += items[i].amount * souvenir[0].price;
-        }
-
+        let souvenirs = await this._Souvenir.find();
+        items.forEach(item => {
+            let properSouvenir = souvenirs.find(element => element._id.equals(item.souvenirId));
+            sum += item.amount * properSouvenir.price;
+        });
 
         return sum;
         // Данный метод должен считать общую стоимость корзины пользователя login
