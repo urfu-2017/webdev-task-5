@@ -27,7 +27,7 @@ module.exports = class Queries {
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             login: { type: String, unique: true },
             items: [{
-                souvenirId: mongoose.Schema.ObjectId,
+                souvenirId: { type: mongoose.Schema.ObjectId, ref: 'Souvenir' },
                 amount: { type: Number, min: 0 }
             }]
         });
@@ -87,9 +87,7 @@ module.exports = class Queries {
     searchSouvenirs(substring) {
         // Данный метод должен возвращать все сувениры, в название которых входит
         // подстрока substring. Поиск должен быть регистронезависимым
-        const regExp = new RegExp(substring, 'i');
-
-        return this._Souvenir.find({ name: regExp });
+        return this._Souvenir.find({ name: { $regex: substring, $options: 'i' } });
     }
 
     getDisscusedSouvenirs(date) {
@@ -134,14 +132,10 @@ module.exports = class Queries {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        const cart = await this._Cart.findOne({ login });
+        const cart = await this._Cart.findOne({ login }).populate('items.souvenirId', 'price');
 
-        let sum = 0;
-        for (const item of cart.items) {
-            const souvenir = await this._Souvenir.findById(item.souvenirId);
-            sum += souvenir.price * item.amount;
-        }
-
-        return sum;
+        return cart.items.reduce((previous, item) => {
+            return previous + item.souvenirId.price * item.amount;
+        }, 0);
     }
 };
