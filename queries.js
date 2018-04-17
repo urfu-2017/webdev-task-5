@@ -130,8 +130,14 @@ module.exports = class Queries {
     async getCartSum(login) {
         const customer = await this._Cart.find({ login: login });
         let items = customer[0].items;
+        let itemsIds = items.reduce((acc, current)=>{
+            acc.push(current.souvenirId);
+
+            return acc;
+
+        }, []);
         let sum = 0;
-        let souvenirs = await this._Souvenir.find();
+        let souvenirs = await this._Souvenir.find({ _id: { $in: itemsIds } });
         items.forEach(item => {
             let properSouvenir = souvenirs.find(element => element._id.equals(item.souvenirId));
             sum += item.amount * properSouvenir.price;
