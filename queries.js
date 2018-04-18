@@ -117,8 +117,8 @@ module.exports = class Queries {
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-        let souvenir = await this._Souvenir.findById(souvenirId);
-        let review = {
+        const souvenir = await this._Souvenir.findById(souvenirId);
+        const review = {
             login,
             rating,
             text,
@@ -144,19 +144,28 @@ module.exports = class Queries {
         // Данный метод должен считать общую стоимость корзины пользователя login
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
-        let cart = await this._Cart.findOne({ login: login });
-        let souvenirsIdToAmount = {};
-        for (let souvenir of cart.items) {
-            souvenirsIdToAmount[souvenir.souvenirId] = souvenir.amount;
-        }
-        let souvenirs = await this._Souvenir
-            .find({ _id: { $in: Object.keys(souvenirsIdToAmount) } });
+        const result = await this._Cart
+            .aggregate()
+            .match({ login })
+            .unwind('items')
+            .replaceRoot('items')
+            .lookup({
+                from: this._Souvenir.collection.name,
+                localField: 'souvenirId',
+                foreignField: '_id',
+                as: 'souvenirs'
+            })
+            .unwind('souvenirs')
+            .group({
+                _id: null,
+                cost: { $sum: { $multiply: ['$souvenirs.price', '$amount'] } }
+            });
 
-        let totalPrice = 0;
-        for (let souvenir of souvenirs) {
-            totalPrice += souvenir.price * souvenirsIdToAmount[souvenir._id];
+
+        if (result.length > 0) {
+            return result[0].cost;
         }
 
-        return totalPrice;
+        return 0;
     }
 };
