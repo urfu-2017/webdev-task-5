@@ -169,8 +169,12 @@ module.exports = class Queries {
 
         prices.forEach(priceObj => {
             const storageId = priceObj._id;
-            const product = items.find(item => String(item._doc.souvenirId) === String(storageId));
-            product.price = priceObj.price;
+            items.forEach(item => {
+                const cartId = item._doc.souvenirId;
+                if (String(cartId) === String(storageId)) {
+                    item.price = priceObj.price;
+                }
+            });
         });
 
         const filterItems = items.filter(item => item.hasOwnProperty('price'));
