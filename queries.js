@@ -127,7 +127,7 @@ module.exports = class Queries {
 
         const souvenir = await this._Souvenir.findOne(
             { _id: souvenirId },
-            { _id: 0, reviews: 1 }
+            { _id: 0, reviews: 1, rating: 1 }
         );
 
         const reviews = souvenir.reviews;
