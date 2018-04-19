@@ -140,9 +140,7 @@ module.exports = class Queries {
             isApproved: false
         });
 
-        const newRating = reviews.reduce((currentRating, review, index) => {
-            return (currentRating * index + review.rating) / (index + 1);
-        }, 0);
+        const newRating = (souvenir.rating * (reviews.length - 1) + rating) / reviews.length;
 
         return await this._Souvenir.updateOne(
             { _id: souvenirId },
