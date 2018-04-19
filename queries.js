@@ -132,8 +132,6 @@ module.exports = class Queries {
 
         const reviews = souvenir.reviews;
 
-        const newRating = (souvenir.rating * reviews.length + rating) / (reviews.length + 1);
-
         reviews.push({
             login: String(login),
             date: new Date(),
@@ -141,6 +139,10 @@ module.exports = class Queries {
             rating: parseFloat(rating),
             isApproved: false
         });
+
+        const newRating = reviews.reduce((currentRating, review, index) => {
+            return (currentRating * index + review.rating) / (index + 1);
+        }, 0);
 
         return await this._Souvenir.updateOne(
             { _id: souvenirId },
@@ -169,12 +171,8 @@ module.exports = class Queries {
 
         prices.forEach(priceObj => {
             const storageId = priceObj._id;
-            items.forEach(item => {
-                const cartId = item._doc.souvenirId;
-                if (String(cartId) === String(storageId)) {
-                    item.price = priceObj.price;
-                }
-            });
+            const product = items.find(item => String(item._doc.souvenirId) === String(storageId));
+            product.price = priceObj.price;
         });
 
         const filterItems = items.filter(item => item.hasOwnProperty('price'));
