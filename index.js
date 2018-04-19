@@ -12,10 +12,7 @@ const Queries = require('./queries');
     });
 
     try {
-        // Здесь можно делать запросы, чтобы проверять, что они правильно работают
-        const result = await queries.getAllSouvenirs();
-
-        console.info(result);
+        await queries.getAllSouvenirs();
     } catch (error) {
         console.error(error);
     }
