@@ -140,7 +140,7 @@ class Queries {
         // Метод должен возвращать объект формата { ok: 1, n: количество удаленных сувениров }
         // в случае успешного удаления
 
-        return this._Souvenir.remove({ amount: 0 });
+        return this._Souvenir.deleteMany({ amount: 0 });
     }
 
     async addReview(souvenirId, { login, rating, text }) {
@@ -174,13 +174,25 @@ class Queries {
         // в схеме
 
         const items = (await this._Cart.findOne({ login })).items;
-        let sum = 0;
 
-        for (const item of items) {
-            sum += (await this._Souvenir.findById(item.souvenirId)).price * item.amount;
-        }
+        const amounts = items.reduce((prev, next) => {
+            prev[next.souvenirId] = next.amount;
 
-        return sum;
+            return prev;
+        }, {});
+
+        return this._Souvenir
+            .where({
+                _id: {
+                    $in: items.map(({ souvenirId }) => souvenirId)
+                }
+            })
+            .select('price _id')
+            .then(result => result.reduce((prev, next) => {
+                const nextPrice = next.price * amounts[next._id];
+
+                return prev + nextPrice;
+            }, 0));
     }
 }
 
