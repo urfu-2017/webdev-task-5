@@ -16,10 +16,12 @@ module.exports = class Queries {
             image: String,
             price: Number,
             amount: Number,
-            country: { type: String, index: true },
+            country: String,
             rating: Number,
             isRecent: Boolean
         });
+        
+        souvenirSchema.index({country: 1, rating: 1, price: 1});
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             items: [{
