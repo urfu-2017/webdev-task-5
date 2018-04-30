@@ -20,8 +20,8 @@ module.exports = class Queries {
             rating: Number,
             isRecent: Boolean
         });
-        
-        souvenirSchema.index({country: 1, rating: 1, price: 1});
+
+        souvenirSchema.index({ country: 1, rating: 1, price: 1 });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             items: [{
