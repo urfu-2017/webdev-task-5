@@ -8,8 +8,7 @@ module.exports = class Queries {
                 id: mongoose.Schema.Types.ObjectId,
                 login: {
                     type: String,
-                    index: true,
-                    unique: true
+                    index: true
                 },
                 date: Date,
                 text: String,
