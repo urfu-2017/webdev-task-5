@@ -5,7 +5,7 @@ module.exports = class Queries {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             tags: [String],
             reviews: [mongoose.Schema({ // eslint-disable-line new-cap
-                id: mongoose.Schema.Types.ObjectId,
+                _id: mongoose.Schema.Types.ObjectId,
                 login: {
                     type: String,
                     index: true
