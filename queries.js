@@ -3,11 +3,52 @@
 module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            // Ваша схема сувенира тут
+            tags: [String],
+            reviews: [mongoose.Schema({ // eslint-disable-line new-cap
+                id: mongoose.Schema.Types.ObjectId,
+                login: {
+                    type: String,
+                    index: true,
+                    unique: true
+                },
+                date: Date,
+                text: String,
+                rating: {
+                    type: Number,
+                    min: 0,
+                    max: 5
+                },
+                isApproved: Boolean
+            })],
+            name: String,
+            image: String,
+            price: {
+                type: Number,
+                index: true
+            },
+            amount: Number,
+            country: {
+                type: String,
+                index: true
+            },
+            rating: {
+                type: Number,
+                min: 0,
+                max: 5
+            },
+            isRecent: Boolean
         });
 
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            // Ваша схема корзины тут
+            items: [{
+                souvenirId: mongoose.Schema.Types.ObjectId,
+                amount: Number
+            }],
+            login: {
+                type: String,
+                index: true,
+                unique: true
+            }
         });
 
         // Модели в таком формате нужны для корректного запуска тестов
@@ -18,7 +59,7 @@ module.exports = class Queries {
     // Далее идут методы, которые вам необходимо реализовать:
 
     getAllSouvenirs() {
-        // Данный метод должен возвращать все сувениры
+        return this._Souvenir.find();
     }
 
     getCheapSouvenirs(price) {
