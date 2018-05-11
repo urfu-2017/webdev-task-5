@@ -9,17 +9,16 @@ module.exports = class Queries {
             // Ваша схема сувенира тут
             tags: [String],
             reviews: [{
-                _id: mongoose.Schema.ObjectId,
                 login: String,
-                date: Date,
+                timestamps: { createdAt: 'Date' },
                 text: String,
                 rating: Number,
-                isApproved: Boolean
+                isApproved: { type: Boolean, default: false }
             }],
-            name: String,
+            name: { type: String, required: true },
             image: String,
-            price: Number,
-            amount: Number,
+            price: { type: Number, required: true },
+            amount: { type: Number, default: 0 },
             country: String,
             rating: Number,
             isRecent: Boolean
@@ -30,8 +29,8 @@ module.exports = class Queries {
         const cartSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема корзины тут
             items: [{
-                souvenirId: mongoose.Schema.ObjectId,
-                amount: Number
+                souvenirId: { type: mongoose.Schema.Types.ObjectId, ref: 'Souvenir' },
+                amount: { type: Number, default: 1 }
             }],
             login: { type: String, unique: true, dropDups: true }
         });
@@ -73,10 +72,12 @@ module.exports = class Queries {
         // ! Важно, чтобы метод работал очень быстро,
         // поэтому учтите это при определении схем
 
-        return this._Souvenir.where('country', country)
-            .where('rating').gte(rating)
-            .where('price').lte(price)
-            .count();
+        return this._Souvenir.count(
+            {
+                country: country,
+                rating: { $gte: rating },
+                price: { $lte: price }
+            });
     }
 
     searchSouvenirs(substring) {
@@ -104,25 +105,18 @@ module.exports = class Queries {
     }
 
     async addReview(souvenirId, { login, rating, text }) {
-        // Данный метод должен добавлять отзыв к сувениру souvenirId, отзыв добавляется
+        // Данный метод должен добавлять отзыв к сувениру souvenir, отзыв добавляется
         // в конец массива (чтобы сохранить упорядоченность по дате),
         // содержит login, rating, text - из аргументов,
         // date - текущая дата и isApproved - false
         // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
         const souvenir = await this._Souvenir.findById(souvenirId);
 
-        let sum = rating;
-        souvenir.reviews.forEach((review) => {
-            sum += review.rating;
-        });
-
-        souvenir.rating = sum / (souvenir.reviews.length + 1);
+        souvenir.rating = (souvenir.rating + rating) / (souvenir.reviews.length + 1);
         souvenir.reviews.push({
             login,
-            date: Date.now(),
             text,
-            rating,
-            isApproved: false
+            rating
         });
 
         return souvenir.save();
@@ -133,14 +127,13 @@ module.exports = class Queries {
         // У пользователя может быть только одна корзина, поэтому это тоже можно отразить
         // в схеме
 
-        const person = await this._Cart.findOne({ 'login': login });
-        let cartCost = 0;
+        const person = await this._Cart.findOne({ 'login': login })
+            .populate('items.souvenirId');
 
-        for (let i = 0; i < person.items.length; i++) {
-            const souvenir = await this._Souvenir.findById(person.items[i].souvenirId);
-            cartCost += souvenir.price * person.items[i].amount;
-        }
+        return person.items.reduce((acc, item) => {
+            acc += item.souvenirId.price * item.amount;
 
-        return cartCost;
+            return acc;
+        }, 0);
     }
 };
