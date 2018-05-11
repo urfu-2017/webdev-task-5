@@ -5,6 +5,7 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
 
         const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
+            _id: mongoose.Schema.ObjectId,
             login: String,
             text: String,
             rating: Number,
