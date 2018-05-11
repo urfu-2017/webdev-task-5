@@ -5,12 +5,11 @@ module.exports = class Queries {
     constructor(mongoose, { souvenirsCollection, cartsCollection }) {
 
         const reviewSchema = mongoose.Schema({ // eslint-disable-line new-cap
-            _id: mongoose.Schema.ObjectId,
             login: String,
             text: String,
             rating: Number,
             isApproved: { type: Boolean, default: false }
-        }, { timestamps: { createdAt: 'date' } });
+        }, { timestamps: { createdAt: 'date', updatedAt: null } });
 
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема сувенира тут
