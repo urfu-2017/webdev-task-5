@@ -104,23 +104,24 @@ module.exports = class Queries {
         return this._Souvenir.remove({ amount: 0 });
     }
 
-    // async addReview(souvenirId, { login, rating, text }) {
-    //     // Данный метод должен добавлять отзыв к сувениру souvenir, отзыв добавляется
-    //     // в конец массива (чтобы сохранить упорядоченность по дате),
-    //     // содержит login, rating, text - из аргументов,
-    //     // date - текущая дата и isApproved - false
-    //     // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
-    //     const souvenir = await this._Souvenir.findById(souvenirId);
-    //
-    //     souvenir.rating = (souvenir.rating + rating) / (souvenir.reviews.length + 1);
-    //     souvenir.reviews.push({
-    //         login,
-    //         text,
-    //         rating
-    //     });
-    //
-    //     return souvenir.save();
-    // }
+    async addReview(souvenirId, { login, rating, text }) {
+        // Данный метод должен добавлять отзыв к сувениру souvenir, отзыв добавляется
+        // в конец массива (чтобы сохранить упорядоченность по дате),
+        // содержит login, rating, text - из аргументов,
+        // date - текущая дата и isApproved - false
+        // Обратите внимание, что при добавлении отзыва рейтинг сувенира должен быть пересчитан
+        const souvenir = await this._Souvenir.findById(souvenirId);
+
+        souvenir.rating = (souvenir.rating * souvenir.reviews.length + rating) /
+            (souvenir.reviews.length + 1);
+        souvenir.reviews.push({
+            login,
+            text,
+            rating
+        });
+
+        return souvenir.save();
+    }
 
     async getCartSum(login) {
         // Данный метод должен считать общую стоимость корзины пользователя login
