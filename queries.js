@@ -9,7 +9,10 @@ module.exports = class Queries {
             text: String,
             rating: Number,
             isApproved: { type: Boolean, default: false }
-        }, { timestamps: { createdAt: 'date', updatedAt: null } });
+        }, {
+            timestamps: { createdAt: 'date', updatedAt: null },
+            _id: false
+        });
 
         const souvenirSchema = mongoose.Schema({ // eslint-disable-line new-cap
             // Ваша схема сувенира тут
